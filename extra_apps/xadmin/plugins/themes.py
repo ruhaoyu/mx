@@ -26,6 +26,8 @@ class ThemePlugin(BaseAdminPlugin):
     use_bootswatch = False
     default_theme = static('xadmin/css/themes/bootstrap-xadmin.css')
     bootstrap2_theme = static('xadmin/css/themes/bootstrap-theme.css')
+    Cerulean_theme = static('xadmin/css/themes/Cerulean_theme.css')
+    Cosmo_theme = static('xadmin/css/themes/Cosmo_theme.css')
 
     def init_request(self, *args, **kwargs):
         return self.enable_themes
@@ -58,7 +60,10 @@ class ThemePlugin(BaseAdminPlugin):
         themes = [
             {'name': _(u"Default"), 'description': _(u"Default bootstrap theme"), 'css': self.default_theme},
             {'name': _(u"Bootstrap2"), 'description': _(u"Bootstrap 2.x theme"), 'css': self.bootstrap2_theme},
-            ]
+            {'name': _(u"天蓝"), 'description': _(u"天蓝色"), 'css': self.Cerulean_theme},
+            {'name': _(u"时尚"), 'description': _(u"时尚"), 'css': self.Cosmo_theme},
+
+        ]
         select_css = context.get('site_theme', self.default_theme)
 
         if self.user_themes:
@@ -72,7 +77,7 @@ class ThemePlugin(BaseAdminPlugin):
                 ex_themes = []
                 try:
                     h = httplib2.Http()
-                    resp, content = h.request("https://bootswatch.com/api/3.json", 'GET', '',
+                    resp, content = h.request("http://bootswatch.com/api/3.json", 'GET', '',
                         headers={"Accept": "application/json", "User-Agent": self.request.META['HTTP_USER_AGENT']})
                     if six.PY3:
                         content = content.decode()

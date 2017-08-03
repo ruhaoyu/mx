@@ -29,7 +29,9 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['10.1.5.195']
 
-
+AUTHENTICATION_BACKENDS = (
+    'users.views.CustomBackend',
+)
 # Application definition
 
 INSTALLED_APPS = [
@@ -45,6 +47,7 @@ INSTALLED_APPS = [
     'operation',
     'xadmin',
     'crispy_forms',
+    'captcha',
 
 ]
 AUTH_USER_MODEL = "users.UserProfile"
@@ -133,3 +136,19 @@ USE_TZ = False
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
 
 STATIC_URL = '/static/'
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, "static"),
+)
+
+
+EMAIL_BACKEND = 'django_smtp_ssl.SSLEmailBackend'
+
+EMAIL_HOST = 'smtp.qq.com'
+
+EMAIL_PORT = 465
+
+EMAIL_HOST_USER = '3533186315@qq.com'
+
+EMAIL_HOST_PASSWORD = 'jwtkpbogkhcwcifa'
+
+EMAIL_USE_TLS = True
