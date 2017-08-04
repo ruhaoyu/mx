@@ -11,9 +11,15 @@ class LoginForm(forms.Form):
 
 
 
-# 注册
+# 注册表单
 class RegisterForm(forms.Form):
     email = forms.EmailField(required=True)
     # username = forms.CharField(max_length=50, required=True)
     password = forms.CharField(max_length=50, min_length=2,required=True)
+    captcha = CaptchaField(error_messages={"invalid": u'验证码错误！'})
+
+
+# 忘记密码表单
+class ForgetForm(forms.Form):
+    email = forms.EmailField(required=True)
     captcha = CaptchaField(error_messages={"invalid": u'验证码错误！'})
