@@ -23,3 +23,9 @@ class RegisterForm(forms.Form):
 class ForgetForm(forms.Form):
     email = forms.EmailField(required=True)
     captcha = CaptchaField(error_messages={"invalid": u'验证码错误！'})
+
+
+# 重置密码表单
+class ResetFrom(forms.Form):
+    password1 = forms.CharField(max_length=20, required=True)
+    password2 = forms.CharField(max_length=20, required=True)

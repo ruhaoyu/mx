@@ -1,12 +1,12 @@
 # _*_ encoding:utf-8 _*_
 from django.shortcuts import render
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.backends import ModelBackend
 from django.contrib.auth.hashers import make_password
 from .models import UserProfile, EmailVerifyRecord
 from django.db.models import Q
 from django.views.generic.base import View
-from .forms import LoginForm, RegisterForm, ForgetForm
+from .forms import LoginForm, RegisterForm, ForgetForm, ResetFrom
 from utils.email_send import send_register_email
 
 # Create your views here.
@@ -87,13 +87,20 @@ class LoginView(View):
                 user = authenticate(username=user_name, password=pass_word)
                 if user is not None:
                     login(request, user)
-                    return render(request, "index.html")
+                    return render(request, "base.html", {'user_name': user_name})
                 else:
                     return render(request, "login.html", {'login_form': login_form, 'msg': '用户名或密码错误！'})
             else:
                 return render(request, 'login.html', {'login_form': login_form,'msg': '用户未激活，请激活后再重新登录！'})
         else:
             return render(request, "login.html", {'login_form': login_form})
+
+
+# 退出
+class LogoutView(View):
+    def get(self, request):
+        logout(request)
+        return render(request, 'login.html')
 
 
 # def user_login(request):
@@ -137,7 +144,42 @@ class ForgetPasswordView(View):
 
 class ResetView(View):
     def get(self, request, reset_code):
-        email_code = EmailVerifyRecord.objects.filter(code = reset_code)
-        code = email_code.code
+        reset_form = ResetFrom()
+        all_recode = EmailVerifyRecord.objects.filter(code=reset_code)
+        if all_recode:
+            cord_statue = EmailVerifyRecord.objects.get(code=reset_code)
+            statue = cord_statue.is_used
+            if not statue:
+                for recode in all_recode:
+                    email = recode.email
+                return render(request, "reset.html", {'all_record': all_recode, 'statue': statue, 'email': email})
+            else:
+                return render(request, "reset.html", {'all_record': all_recode, 'statue': statue, 'msg': '链接已失效，请重新获取！'})
+        else:
+            # return render(request, 'resetfail.html')
+            return render(request, "reset.html", {'all_record': all_recode,'msg': '用户不存在，请确认重置密码链接是否正确！'})
+
+# 修改密码，和get分开
+class ModifyView(View):
+    def post(self, request):
+        reset_form = ResetFrom(request.POST)
+        user_email = request.POST.get('email', "")
+        if reset_form.is_valid():
+            password1 = request.POST.get('password1', '')
+            password2 = request.POST.get('password2', '')
+            if password1 != password2:
+                return render(request, 'reset.html', {'msg': '两次密码输入不一致！'})
+            else:
+                user_profile = UserProfile.objects.get(email=user_email)
+                user_profile.password = make_password(password1)
+                user_profile.save()
+                verifies = EmailVerifyRecord.objects.filter(email=user_email)
+                for verify in verifies:
+                    last_verify = verify
+                verify.is_used = True
+                verify.save()
+                return render(request, 'login.html', {'msg': '修改密码成功，请登录！'})
+        else:
+            return render(request, 'reset.html', {'reset_form': reset_form, 'email': user_email})
 
 
