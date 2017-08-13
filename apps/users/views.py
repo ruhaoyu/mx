@@ -87,7 +87,7 @@ class LoginView(View):
                 user = authenticate(username=user_name, password=pass_word)
                 if user is not None:
                     login(request, user)
-                    return render(request, "base.html", {'user_name': user_name})
+                    return render(request, "index.html")
                 else:
                     return render(request, "login.html", {'login_form': login_form, 'msg': '用户名或密码错误！'})
             else:

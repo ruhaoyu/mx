@@ -15,18 +15,18 @@
 
 </head>
 <body>
-<section class="headerwrap ">
+<section class="headerwrap">
     <header>
 		<div  class=" header">
  			<div class="top">
 								<div class="wp">
 					<div class="fl"><p>服务电话：<b>33333333</b></p></div>
 
-					<!--登录后跳转-->
+
                     {% if request.user.is_authenticated %}
                         <div class="personal">
                             <dl class="user fr">
-                                <dd>Hello!&nbsp;{{ user_name }}<img class="down fr" src="{% static 'images/top_down.png' %}"/></dd>
+                                <dd>Hello!&nbsp;{{ request.user }}<img class="down fr" src="{% static 'images/top_down.png' %}"/></dd>
                                 <dt><img width="20" height="20" src="{% static 'media/image/2016/12/default_big_14.png' %}"/></dt>
                             </dl>
                             <div class="userdetail">
@@ -34,7 +34,7 @@
 	                                <dt><img width="80" height="80" src="{% static 'media/image/2016/12/default_big_14.png' %}"/></dt>
 	                                <dd>
 	                                    <h2>欢迎进入</h2>
-	                                    <p>{{ user_name }}</p>
+	                                    <p>{{ request.user }}</p>
 	                                </dd>
                                 </dl>
                                 <div class="btn">
