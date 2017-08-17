@@ -1,7 +1,5 @@
 {% extends 'base.html' %}
-{% load staticfiles %}
-{% block title %}课程机构列表{% endblock %}
-
+{% load staticfiles %}{% block title %}课程机构列表{% endblock %}
 {% block custom_bread %}
     <section>
         <div class="wp">
@@ -159,16 +157,17 @@
                     url:"{% url 'opr:userask' %}",
                     data:$('#jsStayForm').serialize(),
                     async: true,
+
                     success: function(data) {
-                        alert(data)
-                        JSONstringify(data)
-                        alert(data)
-                        alert(data["status"])
-                        if(data["status"] == "success"){
+
+                        var obj_data = JSON.parse(data);
+
+                        if(obj_data["status"] == "success"){
                             $('#jsStayForm')[0].reset();
+                            $('#jsCompanyTips').reset();
                             alert('提交成功')
-                        }else if(data['status'] == 'fail'){
-                            $('#jsCompanyTips').html(data.msg)
+                        }else if(obj_data['status'] == "fail"){
+                            $('#jsCompanyTips').html(obj_data.msg)
                         }
                     },
                 });

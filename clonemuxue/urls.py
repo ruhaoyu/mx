@@ -32,6 +32,8 @@ urlpatterns = [
     url(r'^org/', include('organization.urls', namespace='org')),
     # 用户操作url配置
     url(r'^opr/', include('operation.urls', namespace='opr')),
+    # 课程url配置
+    url(r'^cor/', include('courses.urls', namespace='cor')),
     # 文件上传访问处理
     url('^media/(?P<path>.*)$', serve, {'document_root': MEDIA_ROOT}),
 ]

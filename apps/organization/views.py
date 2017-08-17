@@ -4,6 +4,7 @@ from django.views.generic import View
 from django.http import HttpResponse
 from .models import CourseOrg, CityDict
 from operation.models import UserFavorate
+from users.models import UserProfile
 from pure_pagination import Paginator, EmptyPage, PageNotAnInteger
 
 # Create your views here.
@@ -11,6 +12,7 @@ from pure_pagination import Paginator, EmptyPage, PageNotAnInteger
 
 class OrgView(View):
     def get(self, request):
+        current = 'org_list'
         # 课程机构
         all_orgs = CourseOrg.objects.all()
         # 热门机构，用于排序
@@ -39,7 +41,7 @@ class OrgView(View):
             page = request.GET.get('page', 1)
         except PageNotAnInteger:
             page = 1
-        p = Paginator(all_orgs, 3, request=request)
+        p = Paginator(all_orgs, 5, request=request)
         orgs = p.page(page)
         return render(request, 'org_list.html', {
                  'all_org': orgs,
@@ -49,6 +51,7 @@ class OrgView(View):
                 'category': category,
                 'hot_orgs': hot_orgs,
                 'sort': sort,
+                'current': current,
                 })
 
 
@@ -57,6 +60,10 @@ class OrgHomeView(View):
     def get(self, request,org_id):
         current = 'home'
         course_org = CourseOrg.objects.get(id=int(org_id))
+        user_fav = False
+        if request.user.is_authenticated:
+            if UserFavorate.objects.filter(user=request.user, fav_id=course_org.id, fav_type=2):
+                user_fav = True
         all_courses = course_org.course_set.all()
         all_teacher = course_org.teacher_set.all()
         return render(request, 'org-detail-homepage.html', {
@@ -64,6 +71,7 @@ class OrgHomeView(View):
             'all_teacher': all_teacher,
             'course_org': course_org,
             'current': current,
+            'user_fav': user_fav,
         })
 
 
@@ -73,10 +81,15 @@ class OrgCourseView(View):
         current = 'course'
         course_org = CourseOrg.objects.get(id=int(org_id))
         all_courses = course_org.course_set.all()[:3]
+        user_fav = False
+        if request.user.is_authenticated:
+            if UserFavorate.objects.filter(user=request.user, fav_id=course_org.id, fav_type=2):
+                user_fav = True
         return render(request, 'org-detail-course.html', {
             'all_courses': all_courses,
             'course_org': course_org,
             'current': current,
+            'user_fav': user_fav,
         })
 
 
@@ -85,9 +98,14 @@ class OrgDetailView(View):
     def get(self, request,org_id):
         current = 'detail'
         course_org = CourseOrg.objects.get(id=int(org_id))
+        user_fav = False
+        if request.user.is_authenticated:
+            if UserFavorate.objects.filter(user=request.user, fav_id=course_org.id, fav_type=2):
+                user_fav = True
         return render(request, 'org-detail-desc.html', {
             'course_org': course_org,
             'current': current,
+            'user_fav': user_fav,
         })
 
 
@@ -97,10 +115,15 @@ class OrgTeacherView(View):
         current = 'teacher'
         course_org = CourseOrg.objects.get(id=int(org_id))
         all_teacher = course_org.teacher_set.all()
+        user_fav = False
+        if request.user.is_authenticated:
+            if UserFavorate.objects.filter(user=request.user, fav_id=course_org.id, fav_type=2):
+                user_fav = True
         return render(request, 'org-detail-teachers.html', {
             'course_org': course_org,
             'all_teacher': all_teacher,
             'current': current,
+            'user_fav': user_fav,
         })
 
 
@@ -112,7 +135,7 @@ class AddFavView(View):
         if not request.user.is_authenticated():
             # 判断用户登录状态
             return HttpResponse('{"status":"fail", "msg":"用户未登录"}')
-        exist_records = UserFavorate.objects.filter(user=request, fav_id=fav_id, fav_type=fav_type)
+        exist_records = UserFavorate.objects.filter(user=request.user, fav_id=fav_id, fav_type=fav_type)
         if exist_records:
             # 如果收藏记录存在，则取消收藏
             exist_records.delete()
@@ -122,7 +145,7 @@ class AddFavView(View):
                 user_fav = UserFavorate()
                 user_fav.fav_id = fav_id
                 user_fav.fav_type = fav_type
-
+                user_fav.user = request.user
                 user_fav.save()
                 return HttpResponse('{"status":"success", "msg":"已收藏"}')
             else:

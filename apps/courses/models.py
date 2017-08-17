@@ -12,12 +12,14 @@ class Course(models.Model):
     name = models.CharField(max_length=50, verbose_name=u'课程名')
     dsc = models.CharField(max_length=300, verbose_name=u'课程描述')
     detail = models.TextField(verbose_name=u'课程详情')
-    degree = models.CharField(choices=(('cj','初级'),('zj','中级'),('gj','高级')), max_length=5, verbose_name=u'难度等级')
+    degree = models.CharField(choices=(('cj',u'初级'),('zj',u'中级'),('gj',u'高级')), max_length=5, verbose_name=u'难度等级')
     learn_times = models.IntegerField(default=0, verbose_name=u'学习时长（分钟数）')
     students = models.IntegerField(default=0, verbose_name=u'学习人数')
     fav_nums = models.IntegerField(default=0, verbose_name=u'收藏人数')
+    category = models.CharField(default=u'后端开发', max_length=20, verbose_name=u'课程类别')
     image = models.ImageField(upload_to="courses/%Y/%m", verbose_name=u'封面', max_length=100)
     click_num = models.IntegerField(default=0, verbose_name=u'点击数')
+    tag = models.CharField(default="", verbose_name=u'课程标签', max_length=10)
     add_time = models.DateTimeField(default=datetime.now, verbose_name=u'添加时间')
 
     class Meta:
@@ -36,6 +38,10 @@ class Lesson(models.Model):
     class Meta:
         verbose_name = u'章节'
         verbose_name_plural = verbose_name
+
+    def get_video_name(self):
+        '''获取课程信息名称'''
+        return self.video_set.all()
 
     def __unicode__(self):
         return self.name
