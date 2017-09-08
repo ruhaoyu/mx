@@ -61,7 +61,7 @@ class OrgHomeView(View):
         current = 'home'
         course_org = CourseOrg.objects.get(id=int(org_id))
         user_fav = False
-        if request.user.is_authenticated:
+        if request.user.is_active:
             if UserFavorate.objects.filter(user=request.user, fav_id=course_org.id, fav_type=2):
                 user_fav = True
         all_courses = course_org.course_set.all()
@@ -82,7 +82,7 @@ class OrgCourseView(View):
         course_org = CourseOrg.objects.get(id=int(org_id))
         all_courses = course_org.course_set.all()[:3]
         user_fav = False
-        if request.user.is_authenticated:
+        if request.user.is_active:
             if UserFavorate.objects.filter(user=request.user, fav_id=course_org.id, fav_type=2):
                 user_fav = True
         return render(request, 'org-detail-course.html', {
@@ -99,7 +99,7 @@ class OrgDetailView(View):
         current = 'detail'
         course_org = CourseOrg.objects.get(id=int(org_id))
         user_fav = False
-        if request.user.is_authenticated:
+        if request.user.is_active:
             if UserFavorate.objects.filter(user=request.user, fav_id=course_org.id, fav_type=2):
                 user_fav = True
         return render(request, 'org-detail-desc.html', {
@@ -116,7 +116,7 @@ class OrgTeacherView(View):
         course_org = CourseOrg.objects.get(id=int(org_id))
         all_teacher = course_org.teacher_set.all()
         user_fav = False
-        if request.user.is_authenticated:
+        if request.user.is_active:
             if UserFavorate.objects.filter(user=request.user, fav_id=course_org.id, fav_type=2):
                 user_fav = True
         return render(request, 'org-detail-teachers.html', {
