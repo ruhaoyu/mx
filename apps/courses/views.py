@@ -46,7 +46,7 @@ class CourseDetailView(View):
             relate_course = Course.objects.filter(tag=tag)[:1]
         else:
             relate_course = []
-        lesson = course.lesson_set.all().count()
+        # lesson = course.lesson_set.all().count()
         learn_students = course.usercourse_set.all()[:5]
         course_user_fav = False
         org_user_fav = False
@@ -57,7 +57,6 @@ class CourseDetailView(View):
                 org_user_fav = True
         return render(request, 'course-detail.html', {
             'course': course,
-            'lesson': lesson,
             'learn_students': learn_students,
             'relate_course': relate_course,
             'course_user_fav': course_user_fav,
