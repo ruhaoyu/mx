@@ -69,8 +69,14 @@ class LessonView(View):
     def get(self, request, course_id):
         course = Course.objects.get(id=int(course_id))
         lessons = Lesson.objects.filter(course=course)
+
         return render(request, 'course-video.html', {
             'course': course,
             'lessons': lessons,
         })
+
+
+class VideoView(View):
+    def get(self, request, lesson_id):
+        return render(request, '')
 

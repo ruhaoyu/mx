@@ -3,6 +3,7 @@ from django.shortcuts import render
 from django.http import HttpResponse
 # Create your views here.
 from .forms import UserAskForm
+from .models import CourseComment, Course
 from django.views.generic.base import View
 
 
@@ -15,3 +16,11 @@ class UserAskView(View):
             return HttpResponse('{"status":"success"}')
         else:
             return HttpResponse('{"status":"fail", "msg": "添加出错"}')
+
+
+class CourseCommentView(View):
+    def get(self, request, course_id):
+        course = Course.objects.get(id=int(course_id))
+        return render(request, 'course-comment.html',{
+               'course': course,
+        })

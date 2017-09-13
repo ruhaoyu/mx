@@ -68,12 +68,12 @@
             <div class="content">
                 <div class="mod-tab-menu">
                     <ul class="course-menu clearfix">
-                        <li><a class="ui-tabs-active active" id="learnOn"  href="course-video.html"><span>章节</span></a></li>
-                        <li><a id="commentOn" class="" href="course-comment.html"><span>评论</span></a></li>
+                        <li><a class="ui-tabs-active active" id="learnOn"  href="{% url 'cor:course_lesson' course.id %}"><span>章节</span></a></li>
+                        <li><a id="commentOn" class="" href="{% url 'opr:course_comment' course.id %}"><span>评论</span></a></li>
                     </ul>
                 </div>
                 <div id="notice" class="clearfix">
-                    <div class="l"> <strong>课程公告:</strong> <a  href="javascript:void(0)">Spring的文档以及相关的jar文件已上传</a> </div>
+                    <div class="l"> <strong>课程公告:</strong> <a  href="javascript:void(0)">{{ course.course_notice }}</a> </div>
                 </div>
 
                 <div class="mod-chapters">
@@ -83,31 +83,19 @@
                             <strong><i class="state-expand"></i>{{ lesson.name }}</strong>
                         </h3>
                         <ul class="video">
+                                {% for video in lesson.get_video_name %}
                             <li>
-                                <a target="_blank" href='/video/3662' class="J-media-item studyvideo">{{ lesson.get_video_name }}(0)
+                                <a target="_blank" href='/video/3662' class="J-media-item studyvideo">{{ video.name }}
                                     <i class="study-state"></i>
                                 </a>
                             </li>
-
-                            <li>
-                                <a target="_blank" href='/video/3662' class="J-media-item studyvideo">1.2 基本概念 (0)
-                                    <i class="study-state"></i>
-                                </a>
-                            </li>
-
-                            <li>
-                                <a target="_blank" href='/video/3662' class="J-media-item studyvideo">django settings.py 配置 (0)
-                                    <i class="study-state"></i>
-                                </a>
-                            </li>
+                                {% endfor %}
                     {% endfor %}
                         </ul>
                     </div>
-
-
-
                 </div>
 
+            </div>
             </div>
             <div class="aside r">
                 <div class="bd">
