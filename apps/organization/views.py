@@ -2,7 +2,7 @@
 from django.shortcuts import render
 from django.views.generic import View
 from django.http import HttpResponse
-from .models import CourseOrg, CityDict
+from .models import CourseOrg, CityDict, Teacher
 from operation.models import UserFavorate
 from users.models import UserProfile
 from pure_pagination import Paginator, EmptyPage, PageNotAnInteger
@@ -150,4 +150,23 @@ class AddFavView(View):
                 return HttpResponse('{"status":"success", "msg":"已收藏"}')
             else:
                 return HttpResponse('{"status":"fail", "msg":"收藏出错"}')
+
+
+class TeacherView(View):
+    '''授课教师'''
+    def get(self, request):
+        current = 'teacher'
+        teachers = Teacher.objects.all()
+        hot_teachers = Teacher.objects.order_by('fav_nums').all()[:5]
+        return render(request, 'teacher-list.html', {
+            'current': current,
+            'teachers': teachers,
+            'hot_teachers':hot_teachers,
+        })
+
+
+
+
+
+
 
