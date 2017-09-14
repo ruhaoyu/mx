@@ -9,6 +9,6 @@ urlpatterns = [
     url(r'^list/$', CourseListView.as_view(), name="course_list"),
     # 课程详情
     url(r'^detail/(?P<course_id>\d+)/$', CourseDetailView.as_view(), name="course_detail"),
-    # 章节信息
+    # 课程章节详细信息
     url(r'^lesson/(?P<course_id>\d+)/$', LessonView.as_view(), name="course_lesson"),
         ]

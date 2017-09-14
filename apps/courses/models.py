@@ -13,6 +13,8 @@ class Course(models.Model):
     name = models.CharField(max_length=50, verbose_name=u'课程名')
     dsc = models.CharField(max_length=300, verbose_name=u'课程描述')
     detail = models.TextField(verbose_name=u'课程详情')
+    youneed_know = models.CharField(max_length=200, default='', verbose_name=u'课程须知')
+    teacher_tell = models.CharField(max_length=200, default='', verbose_name=u'老师告诉你')
     course_notice = models.CharField(max_length=50, verbose_name=u'课程公告', null=True, blank=True)
     degree = models.CharField(choices=(('cj',u'初级'),('zj',u'中级'),('gj',u'高级')), max_length=5, verbose_name=u'难度等级')
     learn_times = models.IntegerField(default=0, verbose_name=u'学习时长（分钟数）')
@@ -59,6 +61,8 @@ class Lesson(models.Model):
 class Video(models.Model):
     lesson = models.ForeignKey(Lesson, verbose_name=u'章节')
     name = models.CharField(max_length=100, verbose_name=u'视频名')
+    video_times = models.IntegerField(default=0, verbose_name=u'视频时长（分钟数）')
+    url = models.CharField(max_length=200, default='', verbose_name=u'访问地址')
     add_time = models.DateTimeField(default=datetime.now, verbose_name=u'添加时间')
 
     class Meta:

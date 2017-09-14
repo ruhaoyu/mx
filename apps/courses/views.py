@@ -1,7 +1,7 @@
 # _*_ encoding:utf-8 _*_
 from django.shortcuts import render
 from django.views.generic.base import View
-from .models import Course, Lesson, Video
+from .models import Course, Lesson, Video, CourseRecourse
 from operation.models import UserFavorate
 from pure_pagination import Paginator, EmptyPage, PageNotAnInteger
 # Create your views here.
@@ -43,14 +43,14 @@ class CourseDetailView(View):
         course.save()
         tag = course.tag
         if tag:
-            relate_course = Course.objects.filter(tag=tag)[:1]
+            relate_course = Course.objects.filter(tag=tag).exclude(id=course.id)[:3]
         else:
             relate_course = []
         # lesson = course.lesson_set.all().count()
         learn_students = course.usercourse_set.all()[:5]
         course_user_fav = False
         org_user_fav = False
-        if request.user.is_authenticated:
+        if request.user.is_active:
             if UserFavorate.objects.filter(user=request.user, fav_id=course.id, fav_type=1):
                 course_user_fav = True
             if UserFavorate.objects.filter(user=request.user, fav_id=course.id, fav_type=2):
@@ -69,14 +69,13 @@ class LessonView(View):
     def get(self, request, course_id):
         course = Course.objects.get(id=int(course_id))
         lessons = Lesson.objects.filter(course=course)
-
+        course_resourse = CourseRecourse.objects.filter(course=course)
+        similar_course = Course.objects.filter(students=course.students)
         return render(request, 'course-video.html', {
             'course': course,
             'lessons': lessons,
+            'course_resourse': course_resourse,
+            'similar_course': similar_course,
         })
 
-
-class VideoView(View):
-    def get(self, request, lesson_id):
-        return render(request, '')
 
