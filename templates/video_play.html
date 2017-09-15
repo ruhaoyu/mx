@@ -1,23 +1,5 @@
 {% extends 'base.html' %}
 {% load staticfiles %}
-
-{% block title %}章节信息{% endblock %}
-
-{% block custom_bread %}
-    <section>
-	<div class="wp">
-		<div class="crumbs">
-			<ul>
-				<li><a href="{% url 'index' %}">首页</a>></li>
-                <li><a href="{% url 'cor:course_list' %}">公开课程</a>></li>
-				<li><a href="{% url 'cor:course_detail' course.id %}">课程详情</a>></li>
-                <li>章节信息</li>
-			</ul>
-		</div>
-	</div>
-</section>
-{% endblock %}
-
 {% block custom_css %}
 	<meta charset="UTF-8">
     <meta name="renderer" content="webkit">
@@ -34,32 +16,12 @@
 {% endblock %}
 
 {% block content %}
-    <div id="main">
-    <div class="course-infos">
-        <div class="w pr">
-            <div style="height: 15px" class="path">
-            </div>
-            <div class="hd">
-                <h2 class="l">{{ course.name }}</h2>
-            </div>
-            <div class="statics clearfix">
-                <div class="static-item ">
-                    <span class="meta-value"><strong>{{ course.get_degree_display }}</strong></span>
-                    <span class="meta">难度</span>
-                    <em></em>
-                </div>
-                <div class="static-item static-time">
-                    <span class="meta-value">{{ course.learn_times }}</span>
-                    <span class="meta">时长</span>
-                    <em></em>
-                </div>
-                <div class="static-item">
-                    <span class="meta-value"><strong>{{ course.students }}</strong></span>
-                    <span class="meta">学习人数</span>
-                    <em></em>
-                </div>
-            </div>
-        </div>
+    <div style="width: 1200px;height: 675px; margin-left: 340px">
+        <video id='' class="" controls=""
+        poster="http://video-js.zencoder.com/oceans-clip.png"
+        data-setup='{}'>
+        <source src="" type="video/mp4">
+        </video>
     </div>
     <div class="course-info-main clearfix w has-progress">
 
@@ -85,7 +47,7 @@
                         <ul class="video">
                                 {% for video in lesson.get_video_name %}
                             <li>
-                                <a target="_blank" href='{% url 'cor:video_play' video.id %}' class="J-media-item studyvideo">{{ video.name }}({{ video.video_times }})
+                                <a target="_blank" href='{{ video.url }}' class="J-media-item studyvideo">{{ video.name }}({{ video.video_times }})
                                     <i class="study-state"></i>
                                 </a>
                             </li>
@@ -161,8 +123,4 @@
         </div>
 
     </div>
-
-
-
 {% endblock %}
-

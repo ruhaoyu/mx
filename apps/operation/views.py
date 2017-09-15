@@ -3,8 +3,10 @@ from django.shortcuts import render
 from django.http import HttpResponse
 # Create your views here.
 from .forms import UserAskForm
-from .models import CourseComment, Course
+from .models import CourseComment, Course, UserCourse
+from courses.models import CourseRecourse
 from django.views.generic.base import View
+from utils.mixin_urils import LoginRequiredMixin
 
 
 # 用户咨询
@@ -18,13 +20,24 @@ class UserAskView(View):
             return HttpResponse('{"status":"fail", "msg": "添加出错"}')
 
 
-class CourseCommentView(View):
+class CourseCommentView(LoginRequiredMixin, View):
     def get(self, request, course_id):
         course = Course.objects.get(id=int(course_id))
         comments = CourseComment.objects.filter(course=course)
+        user_courses = UserCourse.objects.filter(course=course)
+        # 取出该课程的所有用户id
+        users = [user_course.user for user_course in user_courses]
+        # 通过用户id列表，取出所有课程
+        all_course = UserCourse.objects.filter(user__in=users)
+        # 取出所有课程id
+        course_ids = [user_course.course.id for user_course in user_courses]
+        relate_courses = Course.objects.filter(id__in=course_ids).order_by('-click_num')[:5]
+        course_resourse = CourseRecourse.objects.filter(course=course)
         return render(request, 'course-comment.html',{
                'course': course,
             'comments': comments,
+            'relate_courses': relate_courses,
+            'course_resourse': course_resourse,
         })
 
 

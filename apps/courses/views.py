@@ -2,8 +2,9 @@
 from django.shortcuts import render
 from django.views.generic.base import View
 from .models import Course, Lesson, Video, CourseRecourse
-from operation.models import UserFavorate
+from operation.models import UserFavorate, UserCourse
 from pure_pagination import Paginator, EmptyPage, PageNotAnInteger
+from utils.mixin_urils import LoginRequiredMixin
 # Create your views here.
 
 class CourseListView(View):
@@ -64,18 +65,55 @@ class CourseDetailView(View):
         })
 
 
-class LessonView(View):
+class LessonView(LoginRequiredMixin,View):
     '''章节信息'''
     def get(self, request, course_id):
         course = Course.objects.get(id=int(course_id))
         lessons = Lesson.objects.filter(course=course)
+        # 判断用户是否关联改用户
+        user = UserCourse.objects.filter(user=request.user, course=course)
+        if not user:
+            user_course = UserCourse()
+            user_course.course = course
+            user_course.user = request.user
+            user_course.save()
+        user_courses = UserCourse.objects.filter(course=course)
+        # 取出该课程的所有用户id
+        users = [user_course.user for user_course in user_courses]
+        # 通过用户id列表，取出所有课程
+        all_course = UserCourse.objects.filter(user__in=users)
+        # 取出所有课程id
+        course_ids = [user_course.course.id for user_course in all_course]
+        relate_courses = Course.objects.filter(id__in=course_ids).order_by('-click_num')[:5]
         course_resourse = CourseRecourse.objects.filter(course=course)
-        similar_course = Course.objects.filter(students=course.students)
         return render(request, 'course-video.html', {
             'course': course,
             'lessons': lessons,
             'course_resourse': course_resourse,
-            'similar_course': similar_course,
+            'relate_courses': relate_courses,
+        })
+
+
+class VidioPlayView(View):
+    def get(self, request, video_id):
+        video = Video.objects.get(id=video_id)
+        course = video.lesson.course
+        lesson = video.lesson
+        user_courses = UserCourse.objects.filter(course=course)
+        # 取出该课程的所有用户id
+        users = [user_course.user for user_course in user_courses]
+        # 通过用户id列表，取出所有课程
+        all_course = UserCourse.objects.filter(user__in=users)
+        # 取出所有课程id
+        course_ids = [user_course.course.id for user_course in all_course]
+        relate_courses = Course.objects.filter(id__in=course_ids).order_by('-click_num')[:5]
+        course_resourse = CourseRecourse.objects.filter(course=course)
+        return render(request, 'video_play.html',{
+            'video': video,
+            'course': course,
+            'lesson': lesson,
+            'relate_courses': relate_courses,
+            'course_resourse': course_resourse,
         })
 
 

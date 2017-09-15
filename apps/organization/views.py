@@ -157,11 +157,28 @@ class TeacherView(View):
     def get(self, request):
         current = 'teacher'
         teachers = Teacher.objects.all()
+        teacher_nums = teachers.count()
         hot_teachers = Teacher.objects.order_by('fav_nums').all()[:5]
-        return render(request, 'teacher-list.html', {
+        sort = request.GET.get('sort', '')
+        if sort:
+            if sort == 'hot':
+                teachers = teachers.order_by('fav_nums')
+            if sort == 'all':
+                teachers = teachers
+        hot_teachers = Teacher.objects.order_by('fav_nums').all()[:5]
+        # 授课教师分页
+        try:
+            page = request.GET.get('page', 1)
+        except PageNotAnInteger:
+            page = 1
+        p = Paginator(teachers, 5, request=request)
+        teachers = p.page(page)
+        return render(request, 'teachers-list.html', {
             'current': current,
             'teachers': teachers,
+            'teacher_nums': teacher_nums,
             'hot_teachers':hot_teachers,
+            'sort': sort,
         })
 
 
