@@ -5,6 +5,7 @@
     <meta name="renderer" content="webkit">
     <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1" >
 	<link rel="stylesheet" type="text/css" href="{% static 'css/reset.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/video-js.scss' %}">
 	<link rel="stylesheet" type="text/css" href="{% static 'css/animate.css' %}">
 	<link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'css/muke/base.css' %}" />
@@ -12,7 +13,7 @@
     <link rel="stylesheet" type="text/css" href="{% static 'css/muke/course/learn-less.css' %}" />
     <link rel="stylesheet" type="text/css" href="{% static 'css/aui.css' %}" />
     <link rel="stylesheet" type="text/css" href="{% static 'css/mooc.css' %}" />
-     <link rel="stylesheet" type="text/css" href="{% static 'css/muke/course/common-less.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/muke/course/common-less.css' %}">
 {% endblock %}
 
 {% block content %}
@@ -20,7 +21,7 @@
         <video id='' class="" controls=""
         poster="http://video-js.zencoder.com/oceans-clip.png"
         data-setup='{}'>
-        <source src="" type="video/mp4">
+        <source src="{{ video.url }}" type="video/mp4">
         </video>
     </div>
     <div class="course-info-main clearfix w has-progress">

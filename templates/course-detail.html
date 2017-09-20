@@ -118,19 +118,23 @@
 			<div class="right layout">
 				<div class="head">相关课程推荐</div>
                 <div class="group_recommend">
-                    {% for course in relate_course %}
-                        <dl>
-                            <dt>
-                                <a target="_blank" href="{% url 'cor:course_detail' course.id %}">
-                                    <img width="240" height="220" class="scrollLoading" src="{{ MEDIA_URL }}{{ course.image }}"/>
-                                </a>
-                            </dt>
-                            <dd>
-                                <a target="_blank" href=""><h2>{{ course.name }}</h2></a>
-                                <span class="fl">学习时长：<i class="key">{{ course.learn_times }}</i></span>
-                            </dd>
-                        </dl>
-                    {% endfor %}
+                    {% if relate_course %}
+                        {% for course in relate_course %}
+                            <dl>
+                                <dt>
+                                    <a target="_blank" href="{% url 'cor:course_detail' course.id %}">
+                                        <img width="240" height="220" class="scrollLoading" src="{{ MEDIA_URL }}{{ course.image }}"/>
+                                    </a>
+                                </dt>
+                                <dd>
+                                    <a target="_blank" href=""><h2>{{ course.name }}</h2></a>
+                                    <span class="fl">学习时长：<i class="key">{{ course.learn_times }}</i></span>
+                                </dd>
+                            </dl>
+                        {% endfor %}
+                    {% else %}
+                        <div>暂时没有相关课程推荐哦</div>
+                    {% endif %}
                 </div>
 			</div>
 		</div>

@@ -153,19 +153,22 @@ class AddFavView(View):
 
 
 class TeacherView(View):
-    '''授课教师'''
+    '''授课教师列表'''
     def get(self, request):
         current = 'teacher'
         teachers = Teacher.objects.all()
         teacher_nums = teachers.count()
         hot_teachers = Teacher.objects.order_by('fav_nums').all()[:5]
+        # 排列名次
+        index = range(1, 6)
+        dict_hot_teachers = zip(index, hot_teachers)
         sort = request.GET.get('sort', '')
         if sort:
             if sort == 'hot':
                 teachers = teachers.order_by('fav_nums')
             if sort == 'all':
                 teachers = teachers
-        hot_teachers = Teacher.objects.order_by('fav_nums').all()[:5]
+
         # 授课教师分页
         try:
             page = request.GET.get('page', 1)
@@ -177,12 +180,36 @@ class TeacherView(View):
             'current': current,
             'teachers': teachers,
             'teacher_nums': teacher_nums,
-            'hot_teachers':hot_teachers,
+            'dict_hot_teachers':dict_hot_teachers,
             'sort': sort,
         })
 
 
-
+class TeacherViewDetail(View):
+    def get(self, request, teacher_id):
+        teacher = Teacher.objects.get(id=int(teacher_id))
+        teacher.click_nums += 1
+        teacher.save()
+        hot_teachers = Teacher.objects.all().order_by('fav_nums')[:5]
+        # 排列名次
+        index = range(1, 6)
+        # 名次和对应的数据组成字典
+        dict_teacher = zip(index, hot_teachers)
+        # 收藏状态在未登录状态下置为未收藏
+        teacher_user_fav = False
+        org_user_fav = False
+        # 在登录情况下，判断是否已收藏
+        if request.user.is_active:
+            if UserFavorate.objects.filter(user=request.user, fav_id=teacher.id, fav_type=3):
+                teacher_user_fav = True
+            if UserFavorate.objects.filter(user=request.user, fav_id=teacher.org.id, fav_type=2):
+                org_user_fav = True
+        return render(request, 'teacher-detail.html', {
+            'teacher': teacher,
+            'dict_teacher': dict_teacher,
+            'teacher_user_fav': teacher_user_fav,
+            'org_user_fav': org_user_fav,
+        })
 
 
 
