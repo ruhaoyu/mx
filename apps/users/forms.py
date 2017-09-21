@@ -3,6 +3,7 @@ __author__ = 'yuruhao'
 __date__ = '2017/8/2 17:21'
 from django import forms
 from captcha.fields import CaptchaField
+from models import UserProfile
 
 # 登录表单
 class LoginForm(forms.Form):
@@ -29,3 +30,10 @@ class ForgetForm(forms.Form):
 class ResetFrom(forms.Form):
     password1 = forms.CharField(max_length=20, required=True)
     password2 = forms.CharField(max_length=20, required=True)
+
+
+# 上传文件表单
+class UploadImageForm(forms.ModelForm):
+    class Meta:
+        model = UserProfile
+        fields = ['image']

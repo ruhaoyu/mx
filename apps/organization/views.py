@@ -6,6 +6,7 @@ from .models import CourseOrg, CityDict, Teacher
 from operation.models import UserFavorate
 from users.models import UserProfile
 from pure_pagination import Paginator, EmptyPage, PageNotAnInteger
+from django.db.models import Q
 
 # Create your views here.
 
@@ -15,6 +16,10 @@ class OrgView(View):
         current = 'org_list'
         # 课程机构
         all_orgs = CourseOrg.objects.all()
+        # 课程机构搜索
+        search_keywords = request.GET.get('keywords', '')
+        if search_keywords:
+            all_orgs = all_orgs.filter(Q(name__icontains=search_keywords)|Q(desc__icontains=search_keywords))
         # 热门机构，用于排序
         hot_orgs = CourseOrg.objects.order_by('click_nums')[:3].all()
         # 类别筛选
@@ -159,6 +164,10 @@ class TeacherView(View):
         teachers = Teacher.objects.all()
         teacher_nums = teachers.count()
         hot_teachers = Teacher.objects.order_by('fav_nums').all()[:5]
+        # 课程机构搜索
+        search_keywords = request.GET.get('keywords', '')
+        if search_keywords:
+            teachers = teachers.filter(Q(name__icontains=search_keywords) | Q(points__icontains=search_keywords))
         # 排列名次
         index = range(1, 6)
         dict_hot_teachers = zip(index, hot_teachers)

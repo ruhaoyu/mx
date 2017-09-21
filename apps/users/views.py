@@ -6,14 +6,15 @@ from django.contrib.auth.hashers import make_password
 from .models import UserProfile, EmailVerifyRecord
 from django.db.models import Q
 from django.views.generic.base import View
-from .forms import LoginForm, RegisterForm, ForgetForm, ResetFrom
+from .forms import LoginForm, RegisterForm, ForgetForm, ResetFrom, UploadImageForm
 from utils.email_send import send_register_email
+from utils.mixin_urils import LoginRequiredMixin
 
 # Create your views here.
 
 
-# 重新定义认证，使邮箱也可以登录
 class CustomBackend(ModelBackend):
+    '''重新定义认证，使邮箱也可以登录'''
     def authenticate(self, username=None, password=None, **kwargs):
         try:
             user = UserProfile.objects.get(Q(username=username)|Q(email=username))
@@ -23,8 +24,8 @@ class CustomBackend(ModelBackend):
             return None
 
 
-# 注册
 class RegisterView(View):
+    '''注册'''
     def get(self, request):
         register_form = RegisterForm()
         return render(request, "register.html", {'register_form': register_form})
@@ -50,8 +51,9 @@ class RegisterView(View):
         else:
             return render(request, 'register.html',{'register_form': register_form})
 
-# 激活
+
 class ActiveUserView(View):
+    '''激活'''
     def get(self, request, active_code):
         email_code = EmailVerifyRecord.objects.get(code=active_code)
         email = email_code.email
@@ -63,8 +65,8 @@ class ActiveUserView(View):
         return render(request, "login.html")
 
 
-# 登录
 class LoginView(View):
+    '''登录'''
     def get(self, request):
         login_form = LoginForm()
         return render(request, "login.html", {'login_form': login_form})
@@ -96,8 +98,9 @@ class LoginView(View):
             return render(request, "login.html", {'login_form': login_form})
 
 
-# 退出
+
 class LogoutView(View):
+    '''退出登录'''
     def get(self, request):
         logout(request)
         return render(request, 'login.html')
@@ -117,8 +120,8 @@ class LogoutView(View):
 #         return render(request, "login.html")
 
 
-# 找回密码
 class ForgetPasswordView(View):
+    '''找回密码'''
     def get(self, request):
         forget_form = ForgetForm()
         return render(request, "forgetpwd.html", {'forget_form': forget_form})
@@ -143,6 +146,7 @@ class ForgetPasswordView(View):
 
 
 class ResetView(View):
+    '''重置密码'''
     def get(self, request, reset_code):
         reset_form = ResetFrom()
         all_recode = EmailVerifyRecord.objects.filter(code=reset_code)
@@ -159,8 +163,9 @@ class ResetView(View):
             # return render(request, 'resetfail.html')
             return render(request, "reset.html", {'all_record': all_recode,'msg': '用户不存在，请确认重置密码链接是否正确！'})
 
-# 修改密码，和get分开
+
 class ModifyView(View):
+    '''修改密码，和get分开'''
     def post(self, request):
         reset_form = ResetFrom(request.POST)
         user_email = request.POST.get('email', "")
@@ -182,4 +187,31 @@ class ModifyView(View):
         else:
             return render(request, 'reset.html', {'reset_form': reset_form, 'email': user_email})
 
+
+class UsercenterInfoView(LoginRequiredMixin, View):
+    '''个人用户中心'''
+    def get(self, request):
+        user = UserProfile.objects.get(username=request.user)
+        user_message = UserProfile()
+        user_nick_name = request.POST.get('nick_name', '')
+        user_birthday = request.POST.get('birday', '')
+        user_gender = request.POST.get('gender', '')
+        user_address = request.POST.get('adrress')
+        user_mobile = request.POST.get('mobile', '')
+        return render(request, 'usercenter-info.html', {
+            'user': user,
+        })
+
+
+class ChangeUserImageView(LoginRequiredMixin, View):
+    '''修改头像'''
+    def post(self, request):
+        image_form = UploadImageForm(request.POST, request.FILES)
+        if image_form.is_valid():
+            image = image_form.cleaned_data['image']
+            request.user.image = image
+            request.user.save()
+        return render(request, 'usercenter-info.html', {
+
+        })
 

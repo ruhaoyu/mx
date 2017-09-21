@@ -5,6 +5,7 @@ from .models import Course, Lesson, Video, CourseRecourse
 from operation.models import UserFavorate, UserCourse
 from pure_pagination import Paginator, EmptyPage, PageNotAnInteger
 from utils.mixin_urils import LoginRequiredMixin
+from django.db.models import Q
 # Create your views here.
 
 class CourseListView(View):
@@ -14,6 +15,10 @@ class CourseListView(View):
         all_courses = Course.objects.all().order_by('-add_time')
         # 热门课程推荐
         hot_courses = all_courses.order_by('fav_nums')[:3]
+        # 课程搜索
+        search_keywords = request.GET.get('keywords', '')
+        if search_keywords:
+            all_courses = all_courses.filter(Q(name__icontains=search_keywords)|Q(detail__icontains=search_keywords)|Q(dsc__icontains=search_keywords))
         sort = request.GET.get('sort', '')
         if sort == 'time':
             all_courses = all_courses.order_by('-add_time')

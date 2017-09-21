@@ -4,7 +4,8 @@ __date__ = '2017/8/9 12:02'
 
 from django.conf.urls import url, include
 from django.views.generic import TemplateView
-from users.views import LoginView, RegisterView, ActiveUserView, ForgetPasswordView, ResetView, ModifyView, LogoutView
+from users.views import LoginView, RegisterView, ActiveUserView, \
+    ForgetPasswordView, ResetView, ModifyView, LogoutView, UsercenterInfoView, ChangeUserImageView
 from organization.views import OrgView
 
 urlpatterns = [
@@ -26,4 +27,8 @@ urlpatterns = [
     url('^reset/(?P<reset_code>.*)/$', ResetView.as_view(), name="reset"),
     # 重置密码修改
     url('^modify/$', ModifyView.as_view(), name="modify"),
+    # 个人中心
+    url('^user_center_info/$', UsercenterInfoView.as_view(), name="usercenterinfo"),
+    # 用户头像修改
+    url('^user_center_info/change_user_image/$', ChangeUserImageView.as_view(), name="change_user_image"),
     ]
