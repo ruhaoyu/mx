@@ -164,7 +164,7 @@
                     xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
                 },
                 success: function(data) {
-                   obj_data = JSON.parse(data)
+                    obj_data = JSON.parse(data)
                     if(obj_data['status'] == 'fail'){
                         if(obj_data['msg'] == '用户未登录'){
                             window.location.href="{% url 'login' %}";

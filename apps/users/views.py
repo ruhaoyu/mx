@@ -9,6 +9,8 @@ from django.views.generic.base import View
 from .forms import LoginForm, RegisterForm, ForgetForm, ResetFrom, UploadImageForm
 from utils.email_send import send_register_email
 from utils.mixin_urils import LoginRequiredMixin
+from django.http import HttpResponse
+import json
 
 # Create your views here.
 
@@ -131,10 +133,7 @@ class ForgetPasswordView(View):
         if forget_form.is_valid():
             email = request.POST.get("email", "")
             user_profile = UserProfile()
-            try:
-                user_data = UserProfile.objects.filter(username=email)
-            except:
-                user_data = None
+            user_data = UserProfile.objects.filter(username=email)
             # 判断用户是否存在
             if user_data:
                 send_register_email(email, "forget")
@@ -211,7 +210,85 @@ class ChangeUserImageView(LoginRequiredMixin, View):
             image = image_form.cleaned_data['image']
             request.user.image = image
             request.user.save()
-        return render(request, 'usercenter-info.html', {
+            return HttpResponse('{"status":"success"}')
+        else:
+            return HttpResponse('{"status":"fail"}')
 
-        })
 
+class ChangeUserMessageView(View):
+    '''修改基本资料'''
+    def get(self, request):
+        user = request.user
+        '''获取前端填写数据并保存'''
+
+        if request.GET.get('nick_name', ''):
+            nick_name = request.GET.get('nick_name', '')
+        else:
+            nick_name = request.user.nick_name
+        if request.GET.get('birday', ''):
+            birday = request.GET.get('birday', '')
+        else:
+            birday = request.user.birday
+        if request.GET.get('gender', ''):
+            gender = request.GET.get('gender', '')
+        else:
+            gender = request.user.gender
+        if request.GET.get('address', ''):
+            address = request.GET.get('address', '')
+        else:
+            address = request.user.address
+        if request.GET.get('mobile', ''):
+            mobile = request.GET.get('mobile', '')
+        else:
+            mobile = request.user.mobile
+        user.nick_name = nick_name
+        user.birday = birday
+        user.gender = gender
+        user.address = address
+        user.mobile = mobile
+        if user.save():
+            return HttpResponse('{"status":"success"}')
+        else:
+            return HttpResponse('{"status":"fail"}')
+
+
+class ModifyUserView(View):
+    '''修改个人中心密码'''
+    def post(self, request):
+        reset_form = ResetFrom(request.POST)
+        if reset_form.is_valid():
+            password1 = request.POST.get('password1', '')
+            password2 = request.POST.get('password2', '')
+            if password1 != password2:
+                return HttpResponse('{"status":"fail", "msg": "密码不一致"}')
+            user = request.user
+            user.password = make_password(password2)
+            user.save()
+            return HttpResponse('{"status":"success"}')
+        else:
+            return HttpResponse(json.dumps(reset_form.errors))
+
+
+class SendEmailCodeView(LoginRequiredMixin, View):
+    '''发送邮箱验证码'''
+    def get(self, request):
+        email = request.GET.get('email', '')
+        if UserProfile.objects.filter(email=email):
+            return HttpResponse('{"email":"邮箱已经存在！"}')
+        status = send_register_email(email, 'updateemail')
+        return HttpResponse('{"status":"发送成功！"}')
+
+
+class UpdateEmailCode(LoginRequiredMixin, View):
+    '''修改个人邮箱'''
+    def post(self, request):
+        email = request.POST.get('email', '')
+        code = request.POST.get('code', '')
+        email_code = EmailVerifyRecord.objects.filter(email=email, code=code, send_type='updateemail')
+        if email_code:
+            user = request.user
+            user.email = email
+            user.save()
+            return HttpResponse('{"status":"success"}')
+        else:
+            return HttpResponse('{"email":"验证码不正确！"}')

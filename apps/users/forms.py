@@ -32,8 +32,11 @@ class ResetFrom(forms.Form):
     password2 = forms.CharField(max_length=20, required=True)
 
 
-# 上传文件表单
+# 上传头像表单
 class UploadImageForm(forms.ModelForm):
     class Meta:
         model = UserProfile
         fields = ['image']
+
+
+

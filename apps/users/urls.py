@@ -5,7 +5,8 @@ __date__ = '2017/8/9 12:02'
 from django.conf.urls import url, include
 from django.views.generic import TemplateView
 from users.views import LoginView, RegisterView, ActiveUserView, \
-    ForgetPasswordView, ResetView, ModifyView, LogoutView, UsercenterInfoView, ChangeUserImageView
+    ForgetPasswordView, ResetView, ModifyView, LogoutView, UsercenterInfoView, \
+    ChangeUserImageView, ChangeUserMessageView, ModifyUserView, SendEmailCodeView, UpdateEmailCode
 from organization.views import OrgView
 
 urlpatterns = [
@@ -31,4 +32,12 @@ urlpatterns = [
     url('^user_center_info/$', UsercenterInfoView.as_view(), name="usercenterinfo"),
     # 用户头像修改
     url('^user_center_info/change_user_image/$', ChangeUserImageView.as_view(), name="change_user_image"),
-    ]
+    # 修改基本资料
+    url('^user_center_info/change_user_message/$', ChangeUserMessageView.as_view(), name="change_user_message"),
+    # 修改个人中心密码
+    url('^user_center_info/change_pd/$', ModifyUserView.as_view(), name="usercenter_change_pd"),
+    # 发送邮箱验证码
+    url('^send_email_code/$', SendEmailCodeView.as_view(), name="cend_email_code"),
+    # 修改邮箱
+    url('^update_email/$', UpdateEmailCode.as_view(), name="update_email"),
+]

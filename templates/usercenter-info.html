@@ -37,7 +37,7 @@
                         <a class="button btn-green btn-w100" id="jsUserResetPwd" style="margin:80px auto;width:100px;">修改密码</a>
                     </div>
 				</div>
-				<form class="perinform" id="jsEditUserForm" action="{% url 'usercenterinfo' %}" autocomplete="off" method="post">
+				<form class="perinform" id="jsEditUserForm" autocomplete="off" >
 					<ul class="right">
 						<li>昵&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;称：
                            <input type="text" name="nick_name" id="nick_name" value="{{ user.nick_name }}" maxlength="10">
@@ -56,19 +56,20 @@
 						    <i class="error-tips"></i>
                         </li>
 						<li>手&nbsp;&nbsp;机&nbsp;&nbsp;号：
-                            <input type="text" name="mobile" id="mobile" placeholder="请输入你的手机号码" value="{{ user.mobile }}" maxlength="10">
+                            <input type="text" name="mobile" id="mobile" placeholder="请输入你的手机号码" value="{{ user.mobile }}" maxlength="11">
                         </li>
                         <li>邮&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;箱：
                         	<input class="borderno" type="text" name="email" readonly="readonly" value="{{ user.email }}"/>
                             <span class="green changeemai_btn">[修改]</span>
                     	</li>
+
 						<li class="button heibtn">
 							<input type="button" id="jsEditUserBtn" value="保存">
 						</li>
 					</ul>
-                        {% csrf_token %}
                     <input type='hidden' name='csrfmiddlewaretoken' value='799Y6iPeEDNSGvrTu3noBrO4MBLv6enY' />
-				</form>
+				    {% csrf_token %}
+                </form>
 			</div>
 		</div>
 	</div>
@@ -116,6 +117,7 @@
                 </div>
                 <input type='hidden' name='csrfmiddlewaretoken' value='DaP7IUKm9FA9nELA9YUlYYWpyIDdCiIP' />
             <input type='hidden' name='csrfmiddlewaretoken' value='799Y6iPeEDNSGvrTu3noBrO4MBLv6enY' />
+            {% csrf_token %}
             </form>
         </div>
     </div>
@@ -136,7 +138,8 @@
                 <input class="changeemai_btn" id="jsChangeEmailBtn" type="button" value="完成"/>
             </div>
             <input type='hidden' name='csrfmiddlewaretoken' value='DaP7IUKm9FA9nELA9YUlYYWpyIDdCiIP' />
-        <input type='hidden' name='csrfmiddlewaretoken' value='799Y6iPeEDNSGvrTu3noBrO4MBLv6enY' />
+            <input type='hidden' name='csrfmiddlewaretoken' value='799Y6iPeEDNSGvrTu3noBrO4MBLv6enY' />
+            {% csrf_token %}
         </form>
     </div>
 
