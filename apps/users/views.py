@@ -4,12 +4,17 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.backends import ModelBackend
 from django.contrib.auth.hashers import make_password
 from .models import UserProfile, EmailVerifyRecord
+from operation.models import UserCourse, UserFavorate
+from organization.models import CourseOrg, Teacher
+from courses.models import Course
+from operation.models import UserMessage
 from django.db.models import Q
 from django.views.generic.base import View
 from .forms import LoginForm, RegisterForm, ForgetForm, ResetFrom, UploadImageForm
 from utils.email_send import send_register_email
 from utils.mixin_urils import LoginRequiredMixin
 from django.http import HttpResponse
+from pure_pagination import Paginator, EmptyPage, PageNotAnInteger
 import json
 
 # Create your views here.
@@ -190,15 +195,13 @@ class ModifyView(View):
 class UsercenterInfoView(LoginRequiredMixin, View):
     '''个人用户中心'''
     def get(self, request):
+        current = 'userinfo'
         user = UserProfile.objects.get(username=request.user)
-        user_message = UserProfile()
-        user_nick_name = request.POST.get('nick_name', '')
-        user_birthday = request.POST.get('birday', '')
-        user_gender = request.POST.get('gender', '')
-        user_address = request.POST.get('adrress')
-        user_mobile = request.POST.get('mobile', '')
+        unread_message_num = UserMessage.objects.filter(user=int(request.user.id), has_read=False).count()
         return render(request, 'usercenter-info.html', {
             'user': user,
+            'current': current,
+            'unread_message_num': unread_message_num,
         })
 
 
@@ -292,3 +295,99 @@ class UpdateEmailCode(LoginRequiredMixin, View):
             return HttpResponse('{"status":"success"}')
         else:
             return HttpResponse('{"email":"验证码不正确！"}')
+
+
+class UserCourseView(LoginRequiredMixin, View):
+    '''个人中心我的课程'''
+    def get(self, request):
+        current = 'mycourse'
+        user_courses = UserCourse.objects.filter(user=request.user)
+        unread_message_num = UserMessage.objects.filter(user=int(request.user.id), has_read=False).count()
+        return render(request, 'usercenter-mycourse.html', {
+            'user_courses': user_courses,
+            'current': current,
+            'unread_message_num': unread_message_num,
+        })
+
+
+class UserFavOrgView(LoginRequiredMixin, View):
+    '''个人中心我的收藏课程机构'''
+    def get(self, request):
+        fav_type = 2
+        current = 'org'
+        user_fav_org = UserFavorate.objects.filter(user=request.user, fav_type=fav_type )
+        # 取出课程机构id
+        org_ids = [org.fav_id for org in user_fav_org]
+        orgs = CourseOrg.objects.filter(id__in=org_ids)
+        unread_message_num = UserMessage.objects.filter(user=int(request.user.id), has_read=False).count()
+        try:
+            page = request.GET.get('page', 1)
+        except PageNotAnInteger:
+            page = 1
+        p = Paginator(orgs, 5, request=request)
+        orgs = p.page(page)
+        return render(request, 'usercenter-fav-org.html', {
+            'orgs': orgs,
+            'current': current,
+            'unread_message_num': unread_message_num,
+        })
+
+
+class UserFavteacherView(LoginRequiredMixin, View):
+    '''个人中心我的收藏授课教师'''
+    def get(self, request):
+        fav_type = 3
+        current = 'teacher'
+        user_fav_teacher = UserFavorate.objects.filter(user=request.user, fav_type=fav_type )
+        teacher_ids = [teacher.fav_id for teacher in user_fav_teacher]
+        teachers = Teacher.objects.filter(id__in=teacher_ids)
+        unread_message_num = UserMessage.objects.filter(user=int(request.user.id), has_read=False).count()
+        try:
+            page = request.GET.get('page', 1)
+        except PageNotAnInteger:
+            page = 1
+        p = Paginator(teachers, 5, request=request)
+        teachers = p.page(page)
+        return render(request, 'usercenter-fav-teacher.html', {
+            'teachers': teachers,
+            'current': current,
+            'unread_message_num': unread_message_num,
+        })
+
+
+class UserFavCouerseView(LoginRequiredMixin, View):
+    '''个人中心我的收藏公开课程'''
+    def get(self, request):
+        fav_type = 1
+        current = 'course'
+        user_fav_course = UserFavorate.objects.filter(user=request.user, fav_type=fav_type )
+        course_ids = [course.fav_id for course in user_fav_course]
+        courses = Course.objects.filter(id__in=course_ids)
+        unread_message_num = UserMessage.objects.filter(user=int(request.user.id), has_read=False).count()
+        try:
+            page = request.GET.get('page', 1)
+        except PageNotAnInteger:
+            page = 1
+        p = Paginator(courses, 5, request=request)
+        courses = p.page(page)
+        return render(request, 'usercenter-fav-course.html', {
+            'courses': courses,
+            'current': current,
+            'unread_message_num': unread_message_num,
+        })
+
+
+class UserMessageView(LoginRequiredMixin, View):
+    def get(self, request):
+        user_message = UserMessage.objects.filter(user=int(request.user.id))
+        unread_message_num = UserMessage.objects.filter(user=int(request.user.id), has_read=False).count()
+        try:
+            page = request.GET.get('page', 1)
+        except PageNotAnInteger:
+            page = 1
+        p = Paginator(user_message, 5, request=request)
+        user_message = p.page(page)
+        return render(request, 'usercenter-message.html', {
+            'user_message': user_message,
+            'unread_message_num': unread_message_num,
+        })

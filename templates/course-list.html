@@ -51,26 +51,26 @@
                         {% endfor %}
 					</div>
                     <div class="pageturn">
-            <ul class="pagelist">
-                {% if all_courses.has_previous %}
-                    <li class="long"><a href="?{{ all_courses.previous_page_number.querystring }}">上一页</a> </li>
-                {% endif %}
-                {% for page in all_courses.pages %}
-                    {% if page %}
-                        {% ifequal page all_org.number %}
-                            <li class="active"><a href="?{{ page.querystring }}">{{ page }}</a></li>
-                        {% else %}
-                            <li><a href="?{{ page.querystring }}" class="page">{{ page }}</a></li>
-                        {% endifequal %}
-                    {% else %}
-                        <li class="none"><a href="">...</a></li>
-                    {% endif %}
-                {% endfor %}
-                {% if all_courses.has_next %}
-                    <li class="long"><a href="?{{ all_courses.next_page_number.querystring }}">下一页</a></li>
-                {% endif %}
-            </ul>
-        </div>
+                        <ul class="pagelist">
+                            {% if all_courses.has_previous %}
+                                <li class="long"><a href="?{{ all_courses.previous_page_number.querystring }}">上一页</a> </li>
+                            {% endif %}
+                            {% for page in all_courses.pages %}
+                                {% if page %}
+                                    {% ifequal page all_courses.number %}
+                                        <li class="active"><a href="?{{ page.querystring }}">{{ page }}</a></li>
+                                    {% else %}
+                                        <li><a href="?{{ page.querystring }}" class="page">{{ page }}</a></li>
+                                    {% endifequal %}
+                                {% else %}
+                                    <li class="none"><a href="">...</a></li>
+                                {% endif %}
+                            {% endfor %}
+                            {% if all_courses.has_next %}
+                                <li class="long"><a href="?{{ all_courses.next_page_number.querystring }}">下一页</a></li>
+                            {% endif %}
+                        </ul>
+                    </div>
 				</div>
                 </div>
 			</div>

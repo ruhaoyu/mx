@@ -6,7 +6,9 @@ from django.conf.urls import url, include
 from django.views.generic import TemplateView
 from users.views import LoginView, RegisterView, ActiveUserView, \
     ForgetPasswordView, ResetView, ModifyView, LogoutView, UsercenterInfoView, \
-    ChangeUserImageView, ChangeUserMessageView, ModifyUserView, SendEmailCodeView, UpdateEmailCode
+    ChangeUserImageView, ChangeUserMessageView, ModifyUserView, SendEmailCodeView, \
+    UpdateEmailCode, UserCourseView, UserFavOrgView, UserFavteacherView, UserFavCouerseView,\
+    UserMessageView
 from organization.views import OrgView
 
 urlpatterns = [
@@ -40,4 +42,14 @@ urlpatterns = [
     url('^send_email_code/$', SendEmailCodeView.as_view(), name="cend_email_code"),
     # 修改邮箱
     url('^update_email/$', UpdateEmailCode.as_view(), name="update_email"),
+    # 我的课程
+    url('^user_courese/$', UserCourseView.as_view(), name="user_course"),
+    # 我的收藏课程机构
+    url('^user_fav_org/$', UserFavOrgView.as_view(), name="user_fav_org"),
+    # 我的收藏授课教师
+    url('^user_fav_teacher/$', UserFavteacherView.as_view(), name="user_fav_teacher"),
+    # 我的收藏课程
+    url('^user_fav_course/$', UserFavCouerseView.as_view(), name="user_fav_course"),
+    # 个人中心我的消息
+    url('^user_message/$', UserMessageView.as_view(), name="user_message"),
 ]
