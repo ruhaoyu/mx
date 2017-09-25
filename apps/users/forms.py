@@ -39,4 +39,11 @@ class UploadImageForm(forms.ModelForm):
         fields = ['image']
 
 
+# 修改用户基本资料表单
+class ChangeUserInfo(forms.ModelForm):
+    class Meta:
+        model = UserProfile
+        fields = ['nick_name', 'birday', 'gender', 'address', 'mobile']
+
+
 

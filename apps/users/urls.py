@@ -8,12 +8,12 @@ from users.views import LoginView, RegisterView, ActiveUserView, \
     ForgetPasswordView, ResetView, ModifyView, LogoutView, UsercenterInfoView, \
     ChangeUserImageView, ChangeUserMessageView, ModifyUserView, SendEmailCodeView, \
     UpdateEmailCode, UserCourseView, UserFavOrgView, UserFavteacherView, UserFavCouerseView,\
-    UserMessageView
+    UserMessageView, IndexView
 from organization.views import OrgView
 
 urlpatterns = [
     # 首页
-    url('^index/$', TemplateView.as_view(template_name='index.html'), name="index"),
+    # url('^index/$', TemplateView.as_view(template_name='index.html'), name="index"),
     # 登录
     url('^login/$', LoginView.as_view(), name="login"),
     # 注册
@@ -52,4 +52,6 @@ urlpatterns = [
     url('^user_fav_course/$', UserFavCouerseView.as_view(), name="user_fav_course"),
     # 个人中心我的消息
     url('^user_message/$', UserMessageView.as_view(), name="user_message"),
+    # 首页
+    url('^index/$', IndexView.as_view(), name="index"),
 ]

@@ -3,14 +3,14 @@ from django.shortcuts import render
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.backends import ModelBackend
 from django.contrib.auth.hashers import make_password
-from .models import UserProfile, EmailVerifyRecord
+from .models import UserProfile, EmailVerifyRecord, Banner
 from operation.models import UserCourse, UserFavorate
 from organization.models import CourseOrg, Teacher
 from courses.models import Course
 from operation.models import UserMessage
 from django.db.models import Q
 from django.views.generic.base import View
-from .forms import LoginForm, RegisterForm, ForgetForm, ResetFrom, UploadImageForm
+from .forms import LoginForm, RegisterForm, ForgetForm, ResetFrom, UploadImageForm, ChangeUserInfo
 from utils.email_send import send_register_email
 from utils.mixin_urils import LoginRequiredMixin
 from django.http import HttpResponse
@@ -220,39 +220,45 @@ class ChangeUserImageView(LoginRequiredMixin, View):
 
 class ChangeUserMessageView(View):
     '''修改基本资料'''
-    def get(self, request):
-        user = request.user
-        '''获取前端填写数据并保存'''
-
-        if request.GET.get('nick_name', ''):
-            nick_name = request.GET.get('nick_name', '')
+    def post(self, request):
+        user = ChangeUserInfo(request.POST, instance=request.user)
+        if user.is_valid():
+            user.save()
+            return HttpResponse("{'status': 'succese'}")
         else:
-            nick_name = request.user.nick_name
-        if request.GET.get('birday', ''):
-            birday = request.GET.get('birday', '')
-        else:
-            birday = request.user.birday
-        if request.GET.get('gender', ''):
-            gender = request.GET.get('gender', '')
-        else:
-            gender = request.user.gender
-        if request.GET.get('address', ''):
-            address = request.GET.get('address', '')
-        else:
-            address = request.user.address
-        if request.GET.get('mobile', ''):
-            mobile = request.GET.get('mobile', '')
-        else:
-            mobile = request.user.mobile
-        user.nick_name = nick_name
-        user.birday = birday
-        user.gender = gender
-        user.address = address
-        user.mobile = mobile
-        if user.save():
-            return HttpResponse('{"status":"success"}')
-        else:
-            return HttpResponse('{"status":"fail"}')
+            return HttpResponse(json.dumps(user.errors))
+        # user = request.user
+        # '''获取前端填写数据并保存'''
+        #
+        # if request.GET.get('nick_name', ''):
+        #     nick_name = request.GET.get('nick_name', '')
+        # else:
+        #     nick_name = request.user.nick_name
+        # if request.GET.get('birday', ''):
+        #     birday = request.GET.get('birday', '')
+        # else:
+        #     birday = request.user.birday
+        # if request.GET.get('gender', ''):
+        #     gender = request.GET.get('gender', '')
+        # else:
+        #     gender = request.user.gender
+        # if request.GET.get('address', ''):
+        #     address = request.GET.get('address', '')
+        # else:
+        #     address = request.user.address
+        # if request.GET.get('mobile', ''):
+        #     mobile = request.GET.get('mobile', '')
+        # else:
+        #     mobile = request.user.mobile
+        # user.nick_name = nick_name
+        # user.birday = birday
+        # user.gender = gender
+        # user.address = address
+        # user.mobile = mobile
+        # if user.save():
+        #     return HttpResponse('{"status":"success"}')
+        # else:
+        #     return HttpResponse('{"status":"fail"}')
 
 
 class ModifyUserView(View):
@@ -313,9 +319,8 @@ class UserCourseView(LoginRequiredMixin, View):
 class UserFavOrgView(LoginRequiredMixin, View):
     '''个人中心我的收藏课程机构'''
     def get(self, request):
-        fav_type = 2
         current = 'org'
-        user_fav_org = UserFavorate.objects.filter(user=request.user, fav_type=fav_type )
+        user_fav_org = UserFavorate.objects.filter(user=request.user, fav_type=2 )
         # 取出课程机构id
         org_ids = [org.fav_id for org in user_fav_org]
         orgs = CourseOrg.objects.filter(id__in=org_ids)
@@ -333,12 +338,17 @@ class UserFavOrgView(LoginRequiredMixin, View):
         })
 
 
+class DeleteFavOrg(LoginRequiredMixin, View):
+    '''删除课程机构收藏'''
+    def post(self, request):
+        user_fav_org = UserFavorate.objects.filter(user=request.user, fav_type=2)
+        pass
+
 class UserFavteacherView(LoginRequiredMixin, View):
     '''个人中心我的收藏授课教师'''
     def get(self, request):
-        fav_type = 3
         current = 'teacher'
-        user_fav_teacher = UserFavorate.objects.filter(user=request.user, fav_type=fav_type )
+        user_fav_teacher = UserFavorate.objects.filter(user=request.user, fav_type=3 )
         teacher_ids = [teacher.fav_id for teacher in user_fav_teacher]
         teachers = Teacher.objects.filter(id__in=teacher_ids)
         unread_message_num = UserMessage.objects.filter(user=int(request.user.id), has_read=False).count()
@@ -358,9 +368,8 @@ class UserFavteacherView(LoginRequiredMixin, View):
 class UserFavCouerseView(LoginRequiredMixin, View):
     '''个人中心我的收藏公开课程'''
     def get(self, request):
-        fav_type = 1
         current = 'course'
-        user_fav_course = UserFavorate.objects.filter(user=request.user, fav_type=fav_type )
+        user_fav_course = UserFavorate.objects.filter(user=request.user, fav_type=1 )
         course_ids = [course.fav_id for course in user_fav_course]
         courses = Course.objects.filter(id__in=course_ids)
         unread_message_num = UserMessage.objects.filter(user=int(request.user.id), has_read=False).count()
@@ -378,6 +387,7 @@ class UserFavCouerseView(LoginRequiredMixin, View):
 
 
 class UserMessageView(LoginRequiredMixin, View):
+    '''个人中心消息中心'''
     def get(self, request):
         user_message = UserMessage.objects.filter(user=int(request.user.id))
         unread_message_num = UserMessage.objects.filter(user=int(request.user.id), has_read=False).count()
@@ -391,3 +401,24 @@ class UserMessageView(LoginRequiredMixin, View):
             'user_message': user_message,
             'unread_message_num': unread_message_num,
         })
+
+
+class IndexView(View):
+    '''首页'''
+    def get(self, request):
+        # 首页课程
+        all_courses = Course.objects.all().order_by('fav_nums')[:6]
+        course_index = range(3,9)
+        courses = zip(course_index, all_courses)
+        # 首页课程机构
+        org_index = [ index%5 for index in range(1,16)]
+        all_orgs = CourseOrg.objects.all().order_by('fav_nums')[:15]
+        orgs = zip(org_index, all_orgs)
+        # banner图
+        banners = Banner.objects.all()
+        return render(request, 'index.html', {
+            'courses': courses,
+            'orgs': orgs,
+            'banners': banners,
+        })
+

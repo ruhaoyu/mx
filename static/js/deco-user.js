@@ -61,7 +61,7 @@ var verify = verifyDialogSubmit(
         success: function(data) {
             if(data.email){
                 Dml.fun.showValidateError($('#jsChangeEmail'), data.email);
-            }else if(data.status == "success"){
+            }else if(data['status'] == "success"){
                 Dml.fun.showErrorTips($('#jsChangePhoneTips'), "邮箱信息更新成功");
                 setTimeout(function(){location.reload();},1000);
             }else{
@@ -159,7 +159,7 @@ $(function(){
         }
         $.ajax({
             cache: false,
-            type: 'get',
+            type: 'post',
             dataType:'json',
             url:"/user_center_info/change_user_message/",
             data:$jsEditUserForm.serialize(),
