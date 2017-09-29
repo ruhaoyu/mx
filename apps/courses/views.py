@@ -14,7 +14,7 @@ class CourseListView(View):
         current = 'course_list'
         all_courses = Course.objects.all().order_by('-add_time')
         # 热门课程推荐
-        hot_courses = all_courses.order_by('fav_nums')[:3]
+        hot_courses = all_courses.order_by('-fav_nums')[:3]
         # 课程搜索
         search_keywords = request.GET.get('keywords', '')
         if search_keywords:
@@ -23,9 +23,9 @@ class CourseListView(View):
         if sort == 'time':
             all_courses = all_courses.order_by('-add_time')
         elif sort == 'hot':
-            all_courses = all_courses.order_by('fav_nums')
+            all_courses = all_courses.order_by('-fav_nums')
         elif sort == 'students':
-            all_courses = all_courses.order_by('students')
+            all_courses = all_courses.order_by('-students')
         try:
             page = request.GET.get('page', 1)
         except PageNotAnInteger:
@@ -75,7 +75,9 @@ class LessonView(LoginRequiredMixin,View):
     def get(self, request, course_id):
         course = Course.objects.get(id=int(course_id))
         lessons = Lesson.objects.filter(course=course)
-        # 判断用户是否关联改用户
+        course.students += 1
+        course.save()
+        # 判断用户是否关联该用户
         user = UserCourse.objects.filter(user=request.user, course=course)
         if not user:
             user_course = UserCourse()

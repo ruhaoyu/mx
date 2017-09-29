@@ -36,4 +36,14 @@ urlpatterns = [
     url(r'^cor/', include('courses.urls', namespace='cor')),
     # 文件上传访问处理
     url('^media/(?P<path>.*)$', serve, {'document_root': MEDIA_ROOT}),
+    # 富文本相关url
+    url(r'^ueditor/',include('DjangoUeditor.urls' )),
+
+    # url('^static/(?P<path>.*)$', serve, {'document_root': STATIC_ROOT}),
 ]
+
+# 全局404页面配置
+handler404 = 'users.views.page_not_found'
+handler500 = 'users.views.page_error'
+handler403 = 'users.views.page_forbidden'
+

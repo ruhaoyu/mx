@@ -13,7 +13,7 @@ from django.views.generic.base import View
 from .forms import LoginForm, RegisterForm, ForgetForm, ResetFrom, UploadImageForm, ChangeUserInfo
 from utils.email_send import send_register_email
 from utils.mixin_urils import LoginRequiredMixin
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from pure_pagination import Paginator, EmptyPage, PageNotAnInteger
 import json
 
@@ -96,7 +96,8 @@ class LoginView(View):
                 user = authenticate(username=user_name, password=pass_word)
                 if user is not None:
                     login(request, user)
-                    return render(request, "index.html")
+                    from django.core.urlresolvers import reverse
+                    return HttpResponseRedirect(reverse('index'))
                 else:
                     return render(request, "login.html", {'login_form': login_form, 'msg': '用户名或密码错误！'})
             else:
@@ -110,7 +111,8 @@ class LogoutView(View):
     '''退出登录'''
     def get(self, request):
         logout(request)
-        return render(request, 'login.html')
+        from django.core.urlresolvers import reverse
+        return HttpResponseRedirect(reverse('index'))
 
 
 # def user_login(request):
@@ -390,7 +392,10 @@ class UserMessageView(LoginRequiredMixin, View):
     '''个人中心消息中心'''
     def get(self, request):
         user_message = UserMessage.objects.filter(user=int(request.user.id))
-        unread_message_num = UserMessage.objects.filter(user=int(request.user.id), has_read=False).count()
+        unread_messages = user_message.filter(has_read=False)
+        for unread_message in unread_messages:
+            unread_message.has_read = True
+            unread_message.save()
         try:
             page = request.GET.get('page', 1)
         except PageNotAnInteger:
@@ -399,7 +404,6 @@ class UserMessageView(LoginRequiredMixin, View):
         user_message = p.page(page)
         return render(request, 'usercenter-message.html', {
             'user_message': user_message,
-            'unread_message_num': unread_message_num,
         })
 
 
@@ -407,18 +411,47 @@ class IndexView(View):
     '''首页'''
     def get(self, request):
         # 首页课程
-        all_courses = Course.objects.all().order_by('fav_nums')[:6]
+        all_courses = Course.objects.all().order_by('-students')[:6]
         course_index = range(3,9)
         courses = zip(course_index, all_courses)
         # 首页课程机构
         org_index = [ index%5 for index in range(1,16)]
-        all_orgs = CourseOrg.objects.all().order_by('fav_nums')[:15]
+        all_orgs = CourseOrg.objects.all().order_by('-fav_nums')[:15]
         orgs = zip(org_index, all_orgs)
         # banner图
-        banners = Banner.objects.all()
+        banners = Banner.objects.all().order_by('index')
         return render(request, 'index.html', {
             'courses': courses,
             'orgs': orgs,
             'banners': banners,
         })
+
+
+def page_not_found(request):
+    '''全局404处理函数'''
+    from django.shortcuts import render_to_response
+    response = render_to_response('404.html', '')
+    response.status_code = 404
+    return response
+
+
+def page_error(request):
+    '''全局500处理函数'''
+    from django.shortcuts import render_to_response
+    response = render_to_response('500.html', '')
+    response.status_code = 500
+    return response
+
+
+def page_forbidden(request):
+    '''全局500处理函数'''
+    from django.shortcuts import render_to_response
+    response = render_to_response('403.html', '')
+    response.status_code = 403
+    return response
+
+
+
+
+
 

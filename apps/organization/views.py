@@ -3,6 +3,7 @@ from django.shortcuts import render
 from django.views.generic import View
 from django.http import HttpResponse
 from .models import CourseOrg, CityDict, Teacher
+from courses.models import Course
 from operation.models import UserFavorate
 from users.models import UserProfile
 from pure_pagination import Paginator, EmptyPage, PageNotAnInteger
@@ -144,6 +145,18 @@ class AddFavView(View):
         if exist_records:
             # 如果收藏记录存在，则取消收藏
             exist_records.delete()
+            if int(fav_type) == 1:
+                course = Course.objects.get(id=fav_id)
+                course.fav_nums -= 1
+                course.save()
+            if int(fav_type) == 2:
+                org = CourseOrg.objects.get(id=fav_id)
+                org.fav_nums -= 1
+                org.save()
+            if int(fav_type) == 3:
+                teacher = Teacher.objects.get(id=fav_id)
+                teacher.fav_nums -= 1
+                teacher.save()
             return HttpResponse('{"status":"fail", "msg":"收藏"}')
         else:
             if fav_type > 0 and fav_id > 0:
@@ -152,6 +165,18 @@ class AddFavView(View):
                 user_fav.fav_type = fav_type
                 user_fav.user = request.user
                 user_fav.save()
+                if int(fav_type) == 1:
+                    course = Course.objects.get(id=fav_id)
+                    course.fav_nums += 1
+                    course.save()
+                if int(fav_type) == 2:
+                    org = CourseOrg.objects.get(id=fav_id)
+                    org.fav_nums += 1
+                    org.save()
+                if int(fav_type) == 3:
+                    teacher = Teacher.objects.get(id=fav_id)
+                    teacher.fav_nums += 1
+                    teacher.save()
                 return HttpResponse('{"status":"success", "msg":"已收藏"}')
             else:
                 return HttpResponse('{"status":"fail", "msg":"收藏出错"}')

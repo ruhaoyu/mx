@@ -19,6 +19,10 @@ class UserProfile(AbstractUser):
         verbose_name = '用户信息'
         verbose_name_plural = verbose_name
 
+    def unread_nums(self):
+        from operation.models import UserMessage
+        return UserMessage.objects.filter(user=self.id, has_read=False).count()
+
     def __unicode__(self):
         return  self.username
 

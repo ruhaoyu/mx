@@ -86,7 +86,7 @@
 		<div class="head">讲师排行榜</div>
             {% for index, teacher in dict_hot_teachers %}
             <dl class="des">
-                <span class="num fl">{{ index }}</span>
+                <span class="num fl">{{ forloop.counter|add:0 }}</span>
                 <a href="/diary/hk_detail/6/">
                     <dt>
                         <img width="50" height="50" class="scrollLoading"  src="{{ MEDIA_URL }}{{ teacher.image }}"/>

@@ -27,7 +27,7 @@ SECRET_KEY = 'k!0i3m6a99$^4$!!iz#29*us2jgz9623y&ia9y_0-h6ncl(!k('
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['10.1.5.195']
+ALLOWED_HOSTS = ['*']
 
 AUTHENTICATION_BACKENDS = (
     'users.views.CustomBackend',
@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'crispy_forms',
     'captcha',
     'pure_pagination',
+    'DjangoUeditor',
 
 ]
 AUTH_USER_MODEL = "users.UserProfile"
@@ -157,3 +158,5 @@ EMAIL_USE_TLS = True
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# STATIC_ROOT = os.path.join(BASE_DIR, 'static')
