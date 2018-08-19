@@ -94,11 +94,18 @@ WSGI_APPLICATION = 'clonemuxue.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'mxonline',
+        'HOST': 'localhost',
+        'PORT': '3306',
+        'NAME': 'mx',
         'USER': 'root',
-        'PASSWORD': '123456',
-        'HOST': '127.0.0.1',
-    }
+        'PASSWORD': 'qq123456',
+        'TEST': {
+            # 'NAME': 'mytestdatabase',
+            # 'CHARSET':'UTF-8',
+            # 'COLLATION'
+            'MIRROR': 'default'
+        }
+    },
 }
 
 
