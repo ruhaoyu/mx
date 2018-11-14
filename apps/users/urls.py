@@ -13,7 +13,7 @@ from organization.views import OrgView
 
 urlpatterns = [
     # 首页
-    # url('^index/$', TemplateView.as_view(template_name='index.html'), name="index"),
+    url('^index/$', TemplateView.as_view(template_name='index.html'), name="index"),
     # 登录
     url('^login/$', LoginView.as_view(), name="login"),
     # 注册

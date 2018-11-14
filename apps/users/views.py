@@ -42,7 +42,7 @@ class RegisterView(View):
             # email = request.POST.get("email", "")
             user_name = request.POST.get("email", "")
             pass_word = request.POST.get("password", "")
-            search_user = UserProfile.objects.filter(email=user_name)
+            search_user = UserProfile.objects.filter(email=user_name).first()
             # 判断用户是否存在，否则不能注册
             if not search_user:
                 user_profile = UserProfile()

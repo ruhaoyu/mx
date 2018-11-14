@@ -20,11 +20,11 @@ from django.views.generic import TemplateView
 import xadmin
 from django.views.static import serve
 from clonemuxue.settings import MEDIA_ROOT
-
-
+from users.views import LoginView
 
 
 urlpatterns = [
+    url('^$', LoginView.as_view(), name="login"),
     url(r'^xadmin/', xadmin.site.urls),
     # 用户url配置
     url(r'', include('users.urls')),
