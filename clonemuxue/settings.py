@@ -12,6 +12,12 @@ https://docs.djangoproject.com/en/1.9/ref/settings/
 
 import os
 import sys
+QINIU_BUCKET_NAME = 'yuruhaotest'
+QINIU_BUCKET_DOMAIN = 'yuruhaotest'
+from qiniu import Auth
+access_key = 'JC9JF-msOGGN_hOIEO-NgOcunZcpw3ZNQMXnJzZr'
+secret_key = 'p37OJ59VxMdG7-P2NPCRzcPTCWCRTEPXIbFIaEC4'
+q = Auth(access_key, secret_key)
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -45,7 +51,6 @@ INSTALLED_APPS = [
     'courses',
     'organization',
     'operation',
-    'xadmin',
     'crispy_forms',
     'captcha',
     'pure_pagination',

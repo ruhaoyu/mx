@@ -17,7 +17,6 @@ Including another URLconf
 from django.conf.urls import url, include
 from django.contrib import admin
 from django.views.generic import TemplateView
-import xadmin
 from django.views.static import serve
 from clonemuxue.settings import MEDIA_ROOT
 from users.views import LoginView
@@ -25,7 +24,7 @@ from users.views import LoginView
 
 urlpatterns = [
     url('^$', LoginView.as_view(), name="login"),
-    url(r'^xadmin/', xadmin.site.urls),
+    url(r'^admin/', admin.site.urls),
     # 用户url配置
     url(r'', include('users.urls')),
     # 组织机构url配置

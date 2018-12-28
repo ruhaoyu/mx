@@ -2,6 +2,8 @@
 from __future__ import unicode_literals
 from datetime import datetime
 from django.db import models
+
+
 # Create your models here.
 
 
@@ -17,11 +19,15 @@ class CityDict(models.Model):
     def __unicode__(self):
         return self.name
 
+    def __str__(self):
+        return self.name
+
 
 class CourseOrg(models.Model):
     name = models.CharField(max_length=50, verbose_name=u'机构')
     desc = models.TextField(verbose_name=u'机构描述')
-    category = models.CharField(default='pxjg',max_length=20, choices=(('pxjg','培训机构'),('gr','个人'),('gx','高效')), verbose_name=u'机构类别')
+    category = models.CharField(default='pxjg', max_length=20, choices=(('pxjg', '培训机构'), ('gr', '个人'), ('gx', '高效')),
+                                verbose_name=u'机构类别')
     click_nums = models.IntegerField(default=0, verbose_name=u'点击数量')
     fav_nums = models.IntegerField(default=0, verbose_name=u'收藏数量')
     image = models.ImageField(upload_to='org/%Y/%m', verbose_name=u'封面图')
@@ -44,6 +50,9 @@ class CourseOrg(models.Model):
         return self.course_set.all().count()
 
     def __unicode__(self):
+        return self.name
+
+    def __str__(self):
         return self.name
 
 
@@ -73,4 +82,7 @@ class Teacher(models.Model):
         return self.course_set.all()
 
     def __unicode__(self):
+        return self.name
+
+    def __str__(self):
         return self.name
