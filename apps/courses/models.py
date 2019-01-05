@@ -10,8 +10,8 @@ from DjangoUeditor.models import UEditorField
 
 
 class Course(models.Model):
-    course_org = models.ForeignKey(CourseOrg, verbose_name=u'机构', null=True, blank=True)
-    course_teacher = models.ForeignKey(Teacher, verbose_name=u'课程教师', null=True, blank=True)
+    course_org = models.ForeignKey(CourseOrg, verbose_name=u'机构', null=True, blank=True, on_delete=models.SET_NULL)
+    course_teacher = models.ForeignKey(Teacher, verbose_name=u'课程教师', null=True, blank=True, on_delete=models.SET_NULL)
     name = models.CharField(max_length=50, verbose_name=u'课程名')
     dsc = models.CharField(max_length=300, verbose_name=u'课程描述')
     detail = UEditorField(verbose_name=u'课程详情	', width=600, height=300, imagePath="course/ueditor",
@@ -68,7 +68,7 @@ class BannerCourse(Course):
 
 
 class Lesson(models.Model):
-    course = models.ForeignKey(Course, verbose_name=u'课程')
+    course = models.ForeignKey(Course, verbose_name=u'课程', on_delete=models.SET_NULL, null=True)
     name = models.CharField(max_length=100, verbose_name=u'章节名')
     add_time = models.DateTimeField(default=datetime.now, verbose_name=u'添加时间')
 
@@ -88,7 +88,7 @@ class Lesson(models.Model):
 
 
 class Video(models.Model):
-    lesson = models.ForeignKey(Lesson, verbose_name=u'章节')
+    lesson = models.ForeignKey(Lesson, verbose_name=u'章节', on_delete=models.SET_NULL, null=True)
     name = models.CharField(max_length=100, verbose_name=u'视频名')
     video_times = models.IntegerField(default=0, verbose_name=u'视频时长（分钟数）')
     url = models.CharField(max_length=200, default='', verbose_name=u'访问地址')
@@ -106,7 +106,7 @@ class Video(models.Model):
 
 
 class CourseRecourse(models.Model):
-    course = models.ForeignKey(Course, verbose_name=u'课程')
+    course = models.ForeignKey(Course, verbose_name=u'课程', on_delete=models.SET_NULL, null=True)
     name = models.CharField(max_length=100, verbose_name=u'名称')
     download = models.FileField(upload_to='course/resource/%Y/%m', verbose_name=u'资源文件', max_length=100)
     add_time = models.DateTimeField(default=datetime.now, verbose_name=u'添加时间')
