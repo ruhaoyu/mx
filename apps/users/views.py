@@ -1,6 +1,7 @@
 # _*_ encoding:utf-8 _*_
 from django.shortcuts import render
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, logout
+from django.contrib.auth.views import login, logout
 from django.contrib.auth.backends import ModelBackend
 from django.contrib.auth.hashers import make_password
 from .models import UserProfile, EmailVerifyRecord, Banner
@@ -17,14 +18,16 @@ from django.http import HttpResponse, HttpResponseRedirect
 from pure_pagination import Paginator, EmptyPage, PageNotAnInteger
 import json
 
+
 # Create your views here.
 
 
 class CustomBackend(ModelBackend):
     '''重新定义认证，使邮箱也可以登录'''
+
     def authenticate(self, username=None, password=None, **kwargs):
         try:
-            user = UserProfile.objects.get(Q(username=username)|Q(email=username))
+            user = UserProfile.objects.get(Q(username=username) | Q(email=username))
             if user.check_password(password):
                 return user
         except Exception as e:
@@ -32,11 +35,13 @@ class CustomBackend(ModelBackend):
 
 
 class RegisterView(View):
-    '''注册'''
+    """注册"""
+
     def get(self, request):
         register_form = RegisterForm()
         return render(request, "register.html", {'register_form': register_form})
-    def post(self,request):
+
+    def post(self, request):
         register_form = RegisterForm(request.POST)
         if register_form.is_valid():
             # email = request.POST.get("email", "")
@@ -49,18 +54,19 @@ class RegisterView(View):
                 user_profile.username = user_name
                 user_profile.email = user_name
                 user_profile.password = make_password(pass_word)
-                user_profile.is_active = False
+                user_profile.is_active = True
                 user_profile.save()
-                send_staute = send_register_email(user_name, "register")
-                return render(request, 'login.html', {'msg': '注册成功，请激活后登录！'})
+                # send_staute = send_register_email(user_name, "register")
+                return render(request, 'login.html', {'msg': '注册成功'})
             else:
                 return render(request, 'login.html', {'msg': '用户已经存在，请直接登录！'})
         else:
-            return render(request, 'register.html',{'register_form': register_form})
+            return render(request, 'register.html', {'register_form': register_form})
 
 
 class ActiveUserView(View):
     '''激活'''
+
     def get(self, request, active_code):
         email_code = EmailVerifyRecord.objects.get(code=active_code)
         email = email_code.email
@@ -74,6 +80,7 @@ class ActiveUserView(View):
 
 class LoginView(View):
     '''登录'''
+
     def get(self, request):
         login_form = LoginForm()
         return render(request, "login.html", {'login_form': login_form})
@@ -101,14 +108,14 @@ class LoginView(View):
                 else:
                     return render(request, "login.html", {'login_form': login_form, 'msg': '用户名或密码错误！'})
             else:
-                return render(request, 'login.html', {'login_form': login_form,'msg': '用户未激活，请激活后再重新登录！'})
+                return render(request, 'login.html', {'login_form': login_form, 'msg': '用户未激活，请激活后再重新登录！'})
         else:
             return render(request, "login.html", {'login_form': login_form})
 
 
-
 class LogoutView(View):
     '''退出登录'''
+
     def get(self, request):
         logout(request)
         from django.core.urlresolvers import reverse
@@ -131,6 +138,7 @@ class LogoutView(View):
 
 class ForgetPasswordView(View):
     '''找回密码'''
+
     def get(self, request):
         forget_form = ForgetForm()
         return render(request, "forgetpwd.html", {'forget_form': forget_form})
@@ -153,6 +161,7 @@ class ForgetPasswordView(View):
 
 class ResetView(View):
     '''重置密码'''
+
     def get(self, request, reset_code):
         reset_form = ResetFrom()
         all_recode = EmailVerifyRecord.objects.filter(code=reset_code)
@@ -164,14 +173,16 @@ class ResetView(View):
                     email = recode.email
                 return render(request, "reset.html", {'all_record': all_recode, 'statue': statue, 'email': email})
             else:
-                return render(request, "reset.html", {'all_record': all_recode, 'statue': statue, 'msg': '链接已失效，请重新获取！'})
+                return render(request, "reset.html",
+                              {'all_record': all_recode, 'statue': statue, 'msg': '链接已失效，请重新获取！'})
         else:
             # return render(request, 'resetfail.html')
-            return render(request, "reset.html", {'all_record': all_recode,'msg': '用户不存在，请确认重置密码链接是否正确！'})
+            return render(request, "reset.html", {'all_record': all_recode, 'msg': '用户不存在，请确认重置密码链接是否正确！'})
 
 
 class ModifyView(View):
     '''修改密码，和get分开'''
+
     def post(self, request):
         reset_form = ResetFrom(request.POST)
         user_email = request.POST.get('email', "")
@@ -196,6 +207,7 @@ class ModifyView(View):
 
 class UsercenterInfoView(LoginRequiredMixin, View):
     '''个人用户中心'''
+
     def get(self, request):
         current = 'userinfo'
         user = UserProfile.objects.get(username=request.user)
@@ -209,6 +221,7 @@ class UsercenterInfoView(LoginRequiredMixin, View):
 
 class ChangeUserImageView(LoginRequiredMixin, View):
     '''修改头像'''
+
     def post(self, request):
         image_form = UploadImageForm(request.POST, request.FILES)
         if image_form.is_valid():
@@ -222,6 +235,7 @@ class ChangeUserImageView(LoginRequiredMixin, View):
 
 class ChangeUserMessageView(View):
     '''修改基本资料'''
+
     def post(self, request):
         user = ChangeUserInfo(request.POST, instance=request.user)
         if user.is_valid():
@@ -265,6 +279,7 @@ class ChangeUserMessageView(View):
 
 class ModifyUserView(View):
     '''修改个人中心密码'''
+
     def post(self, request):
         reset_form = ResetFrom(request.POST)
         if reset_form.is_valid():
@@ -282,6 +297,7 @@ class ModifyUserView(View):
 
 class SendEmailCodeView(LoginRequiredMixin, View):
     '''发送邮箱验证码'''
+
     def get(self, request):
         email = request.GET.get('email', '')
         if UserProfile.objects.filter(email=email):
@@ -292,6 +308,7 @@ class SendEmailCodeView(LoginRequiredMixin, View):
 
 class UpdateEmailCode(LoginRequiredMixin, View):
     '''修改个人邮箱'''
+
     def post(self, request):
         email = request.POST.get('email', '')
         code = request.POST.get('code', '')
@@ -307,6 +324,7 @@ class UpdateEmailCode(LoginRequiredMixin, View):
 
 class UserCourseView(LoginRequiredMixin, View):
     '''个人中心我的课程'''
+
     def get(self, request):
         current = 'mycourse'
         user_courses = UserCourse.objects.filter(user=request.user)
@@ -320,9 +338,10 @@ class UserCourseView(LoginRequiredMixin, View):
 
 class UserFavOrgView(LoginRequiredMixin, View):
     '''个人中心我的收藏课程机构'''
+
     def get(self, request):
         current = 'org'
-        user_fav_org = UserFavorate.objects.filter(user=request.user, fav_type=2 )
+        user_fav_org = UserFavorate.objects.filter(user=request.user, fav_type=2)
         # 取出课程机构id
         org_ids = [org.fav_id for org in user_fav_org]
         orgs = CourseOrg.objects.filter(id__in=org_ids)
@@ -342,15 +361,18 @@ class UserFavOrgView(LoginRequiredMixin, View):
 
 class DeleteFavOrg(LoginRequiredMixin, View):
     '''删除课程机构收藏'''
+
     def post(self, request):
         user_fav_org = UserFavorate.objects.filter(user=request.user, fav_type=2)
         pass
 
+
 class UserFavteacherView(LoginRequiredMixin, View):
     '''个人中心我的收藏授课教师'''
+
     def get(self, request):
         current = 'teacher'
-        user_fav_teacher = UserFavorate.objects.filter(user=request.user, fav_type=3 )
+        user_fav_teacher = UserFavorate.objects.filter(user=request.user, fav_type=3)
         teacher_ids = [teacher.fav_id for teacher in user_fav_teacher]
         teachers = Teacher.objects.filter(id__in=teacher_ids)
         unread_message_num = UserMessage.objects.filter(user=int(request.user.id), has_read=False).count()
@@ -369,9 +391,10 @@ class UserFavteacherView(LoginRequiredMixin, View):
 
 class UserFavCouerseView(LoginRequiredMixin, View):
     '''个人中心我的收藏公开课程'''
+
     def get(self, request):
         current = 'course'
-        user_fav_course = UserFavorate.objects.filter(user=request.user, fav_type=1 )
+        user_fav_course = UserFavorate.objects.filter(user=request.user, fav_type=1)
         course_ids = [course.fav_id for course in user_fav_course]
         courses = Course.objects.filter(id__in=course_ids)
         unread_message_num = UserMessage.objects.filter(user=int(request.user.id), has_read=False).count()
@@ -390,6 +413,7 @@ class UserFavCouerseView(LoginRequiredMixin, View):
 
 class UserMessageView(LoginRequiredMixin, View):
     '''个人中心消息中心'''
+
     def get(self, request):
         user_message = UserMessage.objects.filter(user=int(request.user.id))
         unread_messages = user_message.filter(has_read=False)
@@ -409,13 +433,14 @@ class UserMessageView(LoginRequiredMixin, View):
 
 class IndexView(View):
     '''首页'''
+
     def get(self, request):
         # 首页课程
         all_courses = Course.objects.all().order_by('-students')[:6]
-        course_index = range(3,9)
+        course_index = range(3, 9)
         courses = zip(course_index, all_courses)
         # 首页课程机构
-        org_index = [ index%5 for index in range(1,16)]
+        org_index = [index % 5 for index in range(1, 16)]
         all_orgs = CourseOrg.objects.all().order_by('-fav_nums')[:15]
         orgs = zip(org_index, all_orgs)
         # banner图
@@ -449,9 +474,3 @@ def page_forbidden(request):
     response = render_to_response('403.html', '')
     response.status_code = 403
     return response
-
-
-
-
-
-

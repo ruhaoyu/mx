@@ -11,6 +11,8 @@ from users.views import LoginView, RegisterView, ActiveUserView, \
     UserMessageView, IndexView
 from organization.views import OrgView
 
+# app_name = 'users'
+
 urlpatterns = [
     # 首页
     url('^index/$', TemplateView.as_view(template_name='index.html'), name="index"),

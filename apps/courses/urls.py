@@ -4,6 +4,7 @@ __date__ = '2017/8/14 20:32'
 
 from django.conf.urls import url
 from .views import CourseListView, CourseDetailView, LessonView, VidioPlayView
+app_name = 'courses'
 urlpatterns = [
     # 课程列表
     url(r'^list/$', CourseListView.as_view(), name="course_list"),

@@ -7,6 +7,8 @@ from django.conf.urls import url
 from organization.views import OrgView, OrgHomeView, OrgCourseView, OrgDetailView, OrgTeacherView,\
     AddFavView, TeacherView, TeacherViewDetail
 
+app_name = 'organization'
+
 urlpatterns = [
     # 课程机构首页
     url('^list/$', OrgView.as_view(), name="org_list"),

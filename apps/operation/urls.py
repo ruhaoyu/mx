@@ -5,6 +5,9 @@ __date__ = '2017/8/9 15:16'
 from django.conf.urls import url
 from operation.views import UserAskView
 from .views import CourseCommentView, AddCommentView
+
+app_name = 'operation'
+
 urlpatterns = [
     # 用户咨询
     url('^userask/$', UserAskView.as_view(), name="userask"),
