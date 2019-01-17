@@ -35,7 +35,14 @@ ALLOWED_HOSTS = ['*']
 
 AUTHENTICATION_BACKENDS = (
     'users.views.CustomBackend',
+    'social_core.backends.weibo.WeiboOAuth2',
+    'social_core.backends.qq.QQOAuth2',
+    'social_core.backends.weixin.WeixinOAuth2',
+    'django.contrib.auth.backends.ModelBackend',
 )
+
+SOCIAL_AUTH_URL_NAMESPACE = 'social'
+SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/index/'
 # Application definition
 
 INSTALLED_APPS = [
@@ -53,6 +60,7 @@ INSTALLED_APPS = [
     'captcha',
     'pure_pagination',
     'DjangoUeditor',
+    'social_django'
 
 ]
 AUTH_USER_MODEL = "users.UserProfile"
@@ -83,6 +91,8 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 # 'django.core.context_processors.media',
+                'social_django.context_processors.backends',
+                'social_django.context_processors.login_redirect',
             ],
         },
     },
@@ -149,9 +159,20 @@ USE_TZ = False
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
 
 STATIC_URL = '/static/'
-STATICFILES_DIRS = (
-    os.path.join(BASE_DIR, "static"),
-)
+# STATICFILES_DIRS = (
+#     os.path.join(BASE_DIR, "static"),
+# )
+# 微博第三方登录
+SOCIAL_AUTH_WEIBO_KEY = '2546694759'
+SOCIAL_AUTH_WEIBO_SECRET = '5b1edc41502631435fda6e8f998b4ad1'
+_WEIBO_APP_KEY = '2546694759'
+_WEIBO_APP_SECRET = '5b1edc41502631435fda6e8f998b4ad1'
+_WEIBO_APP_URL = 'https://api.weibo.com/oauth2/authorize'
+_WEIBO_REDIRECT_URL = 'http://127.0.0.1:8003/complete_weibo/'
+_WEIBO_ACCESS_TOKEN_URL = 'https://api.weibo.com/oauth2/access_token'
+
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'mx_file/')
 
 
 EMAIL_BACKEND = 'django_smtp_ssl.SSLEmailBackend'

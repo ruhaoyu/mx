@@ -10,6 +10,7 @@ from users.views import LoginView, RegisterView, ActiveUserView, \
     UpdateEmailCode, UserCourseView, UserFavOrgView, UserFavteacherView, UserFavCouerseView,\
     UserMessageView, IndexView
 from organization.views import OrgView
+from utils import weibo_login
 
 # app_name = 'users'
 
@@ -56,4 +57,7 @@ urlpatterns = [
     url('^user_message/$', UserMessageView.as_view(), name="user_message"),
     # 首页
     url('^index/$', IndexView.as_view(), name="index"),
+    url('^weibo/get_auth_url/$', weibo_login.get_auth_url, name="get_auth_url"),
+    url('^complete_weibo/$', weibo_login.get_auth_url, name="get_auth_url"),
+    url('^get/access_token/$', weibo_login.get_access_token, name="get_access_token"),
 ]

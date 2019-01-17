@@ -82,7 +82,10 @@
 
                         <a class="fr" href="{% url 'forget_password' %}">忘记密码？</a>
                      </div>
-                     <input class="btn btn-green" id="jsLoginBtn" type="submit" value="立即登录 > " />
+                     <input class="btn btn-green" id="jsLoginBtn" type="submit" value="立即登录" />
+                    <div style="padding: 10px"><span>第三方登录>></span>
+                        <a href="/login/weibo/"><img src="{% static 'img/sina.jpg' %}"></a>
+                    </div>
                 <input type='hidden' name='csrfmiddlewaretoken' value='5I2SlleZJOMUX9QbwYLUIAOshdrdpRcy' />
                 {% csrf_token %}
                 </form>
