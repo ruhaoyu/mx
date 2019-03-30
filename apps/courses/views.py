@@ -124,3 +124,15 @@ class VidioPlayView(View):
         })
 
 
+class Solution:
+    def maxDepth(self):
+        root = TreeNode()
+        if root is None:
+            return 0
+        else:
+            left_height = self.maxDepth(root.left)
+            right_height = self.maxDepth(root.right)
+            print(root.val, left_height, right_height)
+            return max(left_height, right_height) + 1
+
+

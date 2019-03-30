@@ -14,4 +14,5 @@ urlpatterns = [
     url(r'^lesson/(?P<course_id>\d+)/$', LessonView.as_view(), name="course_lesson"),
     # 视频播放页面
     url(r'^video/(?P<video_id>\d+)/$', VidioPlayView.as_view(), name="video_play"),
+    url(r'^test/$', VidioPlayView.as_view(), name="video_play"),
         ]

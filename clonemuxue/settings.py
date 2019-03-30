@@ -34,6 +34,8 @@ DEBUG = True
 ALLOWED_HOSTS = ['*']
 
 AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',
+    'django_auth_ldap.backend.LDAPBackend',
     'users.views.CustomBackend',
     'social_core.backends.weibo.WeiboOAuth2',
     'social_core.backends.qq.QQOAuth2',
@@ -60,7 +62,8 @@ INSTALLED_APPS = [
     'captcha',
     'pure_pagination',
     'DjangoUeditor',
-    'social_django'
+    'social_django',
+    'rest_framework'
 
 ]
 AUTH_USER_MODEL = "users.UserProfile"
@@ -99,6 +102,14 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'clonemuxue.wsgi.application'
+
+REST_FRAMEWORK = {
+    # Use Django's standard `django.contrib.auth` permissions,
+    # or allow read-only access for unauthenticated users.
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+    ]
+}
 
 
 # Database
@@ -161,9 +172,9 @@ END_POINT = ''
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
 
 STATIC_URL = '/static/'
-# STATICFILES_DIRS = (
-#     os.path.join(BASE_DIR, "static"),
-# )
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, "static"),
+)
 # 微博第三方登录
 SOCIAL_AUTH_WEIBO_KEY = '2546694759'
 SOCIAL_AUTH_WEIBO_SECRET = '5b1edc41502631435fda6e8f998b4ad1'
@@ -193,3 +204,32 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
+import ldap
+from django_auth_ldap.config import LDAPSearch, GroupOfNamesType, PosixGroupType, LDAPGroupQuery
+AUTH_LDAP_SERVER_URI = "ldap://xxx.com:389"
+AUTH_LDAP_USER_DN_TEMPLATE = "uid=%(user)s,ou=People,dc=xxx,dc=com,dc=cn"
+AUTH_LDAP_USER_ATTR_MAP = {
+    "username": "uid", "first_name": "cn",
+}
+AUTH_LDAP_ALWAYS_UPDATE_USER = True
+# posixGroup
+# 下面是同步用户组到django的用户组中去。
+AUTH_LDAP_GROUP_SEARCH = LDAPSearch('ou=group,dc=xxx,dc=com,dc=cn', ldap.SCOPE_SUBTREE,"(objectClass=posixGroup)")
+# 这个type 很重要，各位看客注意自己的ldap 组是什么类型
+AUTH_LDAP_GROUP_TYPE = PosixGroupType()
+
+
+# 同步ldap的用户组到用户信息里去，比如dev 或者研发组的 用户就是激活的.
+AUTH_LDAP_FIND_GROUP_PERMS = True
+AUTH_LDAP_USER_FLAGS_BY_GROUP = {
+    "is_active":
+        LDAPGroupQuery("cn=dev,ou=group,dc=xxx,dc=com,dc=cn") |
+        LDAPGroupQuery("cn=ops,ou=group,dc=xxx,dc=com,dc=cn"),
+
+    "is_staff": "cn=ops,ou=group,dc=xxx,dc=com,dc=cn",
+    "is_superuser": "cn=admin,ou=group,dc=xxx,dc=com,dc=cn"
+}
+AUTH_LDAP_CACHE_GROUPS = True
+AUTH_LDAP_GROUP_CACHE_TIMEOUT = 3600
+AUTH_LDAP_MIRROR_GROUPS = True

@@ -113,6 +113,31 @@ class LoginView(View):
             return render(request, "login.html", {'login_form': login_form})
 
 
+def sso_login(request):
+    from clonemuxue.settings import AUTH_LDAP_SERVER_URI as redirect_url
+    """
+    登录成功后要设置用户信息到session 中去 。
+    """
+    if request.method == 'GET':
+        if request.user.is_authenticated:
+            return HttpResponseRedirect(redirect_url)
+        return render(request, 'login.html')
+    else:
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        next_url = request.GET.get('next', None)
+        user = authenticate(username=username, password=password)
+        if user:
+            ret = login(request, user)
+            if not next_url:
+                return HttpResponseRedirect(redirect_url)
+            else:
+                return HttpResponseRedirect(next_url)
+        else:
+            error_message = '用户名或密码错误'
+            return render(request, 'login.html', locals())
+
+
 class LogoutView(View):
     '''退出登录'''
 
