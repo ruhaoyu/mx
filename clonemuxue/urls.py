@@ -5,6 +5,7 @@ from django.contrib import admin
 from django.views.generic import TemplateView
 from django.views.static import serve
 from rest_framework import routers, serializers, viewsets
+from rest_framework.documentation import include_docs_urls
 
 from clonemuxue.settings import MEDIA_ROOT
 from users.views import LoginView
@@ -32,6 +33,7 @@ router.register(r'users', UserViewSet)
 urlpatterns = [
     url(r'^api/', include(router.urls)),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+    url(r'^docs/', include_docs_urls(title='mx')),
     url('^$', LoginView.as_view(), name="login"),
     url(r'^admin/', admin.site.urls),
     # 用户url配置
